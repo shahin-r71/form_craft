@@ -1,247 +1,183 @@
-
 generator client {
   provider = "prisma-client-js"
 }
 
-// Supabase Postgres DataSource
 datasource db {
-  provider = "postgresql"
+  provider  = "postgresql"
   url       = env("DATABASE_URL")
   directUrl = env("DIRECT_URL")
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
-// ENUMS
-// ─────────────────────────────────────────────────────────────────────────────
-
-// Types of fields/questions supported in templates
-enum FieldType {
-  STRING     // Single-line text
-  TEXT       // Multi-line text
-  INTEGER    // Positive integer
-  CHECKBOX   // Boolean (true/false)
-  // can be extended as needed: RADIO, SELECT, DATE, EMAIL, URL, etc.
-}
-
-// ─────────────────────────────────────────────────────────────────────────────
-// MODELS
-// ─────────────────────────────────────────────────────────────────────────────
-
-// 1. User: Represents a user in your application.
-// This model maps to the public.users table, which should be kept in sync
-// with Supabase's built-in auth.users table using database triggers 
-// Your application logic interacts with this public.users table.
 model User {
-  // PK: UUID directly from auth.users.id. Use @db.Uuid for type safety.
-  id            String              @id @db.Uuid
-  email         String              @unique
-  name          String?
-  avatarUrl     String?             @map("avatar_url")
-  isAdmin       Boolean             @default(false) @map("is_admin")
-  isActive      Boolean             @default(true)  @map("is_active")
-  createdAt     DateTime            @default(now()) @map("created_at") @db.Timestamptz(6)
-  updatedAt     DateTime            @updatedAt      @map("updated_at") @db.Timestamptz(6)
+  id             String           @id @db.Uuid
+  email          String           @unique
+  name           String?
+  avatarUrl      String?          @map("avatar_url")
+  isAdmin        Boolean          @default(false) @map("is_admin")
+  isActive       Boolean          @default(true) @map("is_active")
+  createdAt      DateTime         @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt      DateTime         @updatedAt @map("updated_at") @db.Timestamptz(6)
+  comments       Comment[]
+  likes          Like[]
+  submissions    Submission[]
+  templateAccess TemplateAccess[]
+  templates      Template[]       @relation("OwnedTemplates")
 
-
-  // Relations: Representing connections to other tables where User is an author/participant/admin
-  templates     Template[]          @relation("OwnedTemplates") // Templates created by this user
-  submissions   Submission[]        // Forms filled out by this user
-  comments      Comment[]           // Comments made by this user
-  likes         Like[]              // Likes given by this user
-  templateAccess TemplateAccess[]   // Templates this user has explicit access to (for restricted templates)
-
-  @@map("users") // Map the Prisma model User to the public.users table
-  // Note: You MUST set up database triggers in Supabase to sync auth.users <-> public.users.
+  @@map("users")
 }
 
-// 2. Topics: Represents predefined categories for templates.
 model Topic {
-  id          String      @id @default(uuid()) @db.Uuid // Use UUID for consistency
-  name        String      @unique
-  createdAt   DateTime    @default(now()) @map("created_at") @db.Timestamptz(6)
-
-  templates   Template[] // Templates associated with this topic
+  id        String     @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  name      String     @unique
+  createdAt DateTime   @default(now()) @map("created_at") @db.Timestamptz(6)
+  templates Template[]
 
   @@map("topics")
 }
 
-// 3. Tags: Represents available tags that can be applied to templates.
 model Tag {
-  id            String           @id @default(uuid()) @db.Uuid // Use UUID for consistency
-  name          String           @unique
-  createdAt     DateTime         @default(now()) @map("created_at") @db.Timestamptz(6)
+  id           String        @id @default(uuid()) @db.Uuid
+  name         String        @unique
+  createdAt    DateTime      @default(now()) @map("created_at") @db.Timestamptz(6)
+  templateTags TemplateTag[]
 
-  templateTags  TemplateTag[]    // Join table linking this tag to templates
-
+  @@index([name])
   @@map("tags")
-  @@index([name]) // Index for efficient tag autocompletion/search
 }
 
-// 4. Template: Defines the structure and settings of a form or quiz.
 model Template {
-  id            String              @id @default(uuid()) @db.Uuid // Use UUID for consistency
-  title         String
-  description   String?             @db.Text
-  imageUrl      String?             @map("image_url")
-  // isPublic controls access: true for all authenticated, false for restricted users
-  isPublic      Boolean             @default(true)  @map("is_public")
-  // ownerId links to the User who created this template
-  ownerId       String              @db.Uuid         @map("owner_id")
-  // topicId links to the associated Topic
-  topicId       String?             @db.Uuid         @map("topic_id")
-  createdAt     DateTime            @default(now())  @map("created_at") @db.Timestamptz(6)
-  // updatedAt is used for optimistic locking on template structure/settings updates
-  updatedAt     DateTime            @updatedAt       @map("updated_at") @db.Timestamptz(6)
+  id             String           @id @default(uuid()) @db.Uuid
+  title          String
+  description    String?
+  imageUrl       String?          @map("image_url")
+  isPublic       Boolean          @default(true) @map("is_public")
+  ownerId        String           @map("owner_id") @db.Uuid
+  topicId        String?          @map("topic_id") @db.Uuid
+  createdAt      DateTime         @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt      DateTime         @updatedAt @map("updated_at") @db.Timestamptz(6)
+  comments       Comment[]
+  likes          Like[]
+  submissions    Submission[]
+  accessGrants   TemplateAccess[]
+  templateFields TemplateField[]
+  templateTags   TemplateTag[]
+  owner          User             @relation("OwnedTemplates", fields: [ownerId], references: [id], onDelete: Cascade)
+  topic          Topic?           @relation(fields: [topicId], references: [id])
 
-  owner         User                @relation("OwnedTemplates", fields: [ownerId], references: [id], onDelete: Cascade) // If owner deleted, delete their templates
-  topic         Topic?              @relation(fields: [topicId], references: [id], onDelete: SetNull) // If topic deleted, set template's topicId to NULL (safer than CASCADE)
-  templateFields TemplateField[]    // Dynamic list of questions for this template
-  submissions   Submission[]        // Forms submitted based on this template
-  comments      Comment[]           // Comments on this template
-  likes         Like[]              // Likes on this template
-  templateTags  TemplateTag[]       // Join table linking this template to tags
-  accessGrants  TemplateAccess[]    // Explicit access grants for restricted templates
-
-  @@index([ownerId]) // Index for fetching templates by owner
-  @@index([topicId]) // Index for filtering/joining by topic
+  @@index([ownerId])
+  @@index([topicId])
   @@map("templates")
-  // Basic Prisma annotation for Full-Text Search. Requires DB setup in PostgreSQL/Supabase.
-  // Consider indexing title and description, maybe question titles later.
-  // @@fulltext([title, description])
 }
 
-// 5. TemplateField: Represents an individual field (question) within a Template.
-// This model allows for a dynamic number of fields per template.
 model TemplateField {
-  id            String              @id @default(uuid()) @db.Uuid // Use UUID for consistency
-  templateId    String              @db.Uuid       @map("template_id") // Foreign key to the parent Template
-  type          FieldType          // The type of input/question (enum)
-  title         String
-  description   String?             @db.Text
-  required      Boolean             @default(false) // Is this field required in a submission?
-  showInResults Boolean             @default(true) @map("show_in_results") // Show answer in results table?
-  order         Int                 // Order for displaying fields (used for drag-and-drop UI)
-  createdAt     DateTime            @default(now()) @map("created_at") @db.Timestamptz(6)
-  // updatedAt is used for optimistic locking on template field updates
-  updatedAt     DateTime            @updatedAt      @map("updated_at") @db.Timestamptz(6)
+  id               String            @id @default(uuid()) @db.Uuid
+  templateId       String            @map("template_id") @db.Uuid
+  type             FieldType
+  title            String
+  description      String?
+  required         Boolean           @default(false)
+  showInResults    Boolean           @default(true) @map("show_in_results")
+  order            Int
+  createdAt        DateTime          @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt        DateTime          @updatedAt @map("updated_at") @db.Timestamptz(6)
+  fieldSubmissions FieldSubmission[]
+  template         Template          @relation(fields: [templateId], references: [id], onDelete: Cascade)
 
-  template          Template        @relation(fields: [templateId], references: [id], onDelete: Cascade) // If template deleted, delete its fields
-  fieldSubmissions FieldSubmission[] // Answers submitted for this specific field across all submissions
-
-  @@unique([templateId, order]) // Ensure order is unique within a template (helps with reordering logic)
-  @@index([templateId]) // Index for fetching fields by template
+  @@unique([templateId, order])
+  @@index([templateId])
   @@map("template_fields")
 }
 
-// 6. Submission: Represents a single user's filled-out instance of a Template.
-// This is the "form" that a user submits.
 model Submission {
-  id            String              @id @default(uuid()) @db.Uuid // Use UUID for consistency
-  templateId    String              @db.Uuid       @map("template_id") // Foreign key to the Template the submission is based on
-  userId        String              @db.Uuid       @map("user_id") // Foreign key to the User who submitted the form
-  createdAt     DateTime            @default(now()) @map("created_at") @db.Timestamptz(6) // Timestamp when the form was initially submitted
-  // updatedAt is used for optimistic locking on submission updates (e.g., editing answers)
-  updatedAt     DateTime            @updatedAt      @map("updated_at") @db.Timestamptz(6)
+  id               String            @id @default(uuid()) @db.Uuid
+  templateId       String            @map("template_id") @db.Uuid
+  userId           String            @map("user_id") @db.Uuid
+  createdAt        DateTime          @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt        DateTime          @updatedAt @map("updated_at") @db.Timestamptz(6)
+  fieldSubmissions FieldSubmission[]
+  template         Template          @relation(fields: [templateId], references: [id], onDelete: Cascade)
+  user             User              @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-  template          Template        @relation(fields: [templateId], references: [id], onDelete: Cascade) // If template deleted, delete its submissions
-  user              User            @relation(fields: [userId], references: [id], onDelete: Cascade) // If user deleted, delete their submissions
-  fieldSubmissions FieldSubmission[] // Individual answers within this submission
-
-  @@index([templateId]) // Index for fetching submissions by template (e.g., for results)
-  @@index([userId])       // Index for fetching submissions by user (e.g., on personal page)
+  @@index([templateId])
+  @@index([userId])
   @@map("submissions")
 }
 
-// 7. FieldSubmission: Represents a single answer to a specific TemplateField within a Submission.
 model FieldSubmission {
-  id           String              @id @default(uuid()) @db.Uuid // Use UUID for consistency
-  submissionId String              @db.Uuid       @map("submission_id") // Foreign key to the parent Submission
-  // fieldId links to the specific question (TemplateField) this is an answer for
-  templateFieldId String            @db.Uuid       @map("template_field_id")
+  id              String        @id @default(uuid()) @db.Uuid
+  submissionId    String        @map("submission_id") @db.Uuid
+  templateFieldId String        @map("template_field_id") @db.Uuid
+  valueString     String?       @map("value_string")
+  valueInteger    Int?          @map("value_integer")
+  valueBoolean    Boolean?      @map("value_boolean")
+  createdAt       DateTime      @default(now()) @map("created_at") @db.Timestamptz(6)
+  submission      Submission    @relation(fields: [submissionId], references: [id], onDelete: Cascade)
+  field           TemplateField @relation(fields: [templateFieldId], references: [id], onDelete: Cascade)
 
-  // Type-specific value fields. Only one should be non-null based on TemplateField.type
-  valueString  String?             @map("value_string") @db.Text    // For STRING, TEXT
-  valueInteger Int?                @map("value_integer")         // For INTEGER
-  valueBoolean Boolean?            @map("value_boolean")         // For CHECKBOX
-
-  // createdAt captures when the answer was recorded (optional, submission createdAt is primary time)
-  createdAt    DateTime            @default(now()) @map("created_at") @db.Timestamptz(6)
-
-  submission   Submission          @relation(fields: [submissionId], references: [id], onDelete: Cascade) // If submission deleted, delete its answers
-  field        TemplateField       @relation(fields: [templateFieldId], references: [id], onDelete: Cascade) // If template field deleted, delete associated answers (requires careful migration if fields are removed after submissions exist)
-
-  // Ensure only one answer exists for a given question within a submission
   @@unique([submissionId, templateFieldId])
-  @@index([submissionId])     // Index for fetching answers by submission
-  @@index([templateFieldId]) // Index for fetching answers by field (e.g., for aggregation)
+  @@index([submissionId])
+  @@index([templateFieldId])
   @@map("field_submissions")
 }
 
-// 8. Comment: Represents a user comment on a Template.
 model Comment {
-  id           String              @id @default(uuid()) @db.Uuid // Use UUID for consistency
-  userId       String              @db.Uuid       @map("user_id") // Foreign key to the User who commented
-  templateId   String              @db.Uuid       @map("template_id") // Foreign key to the Template being commented on
-  content      String              @db.Text
-  createdAt    DateTime            @default(now()) @map("created_at") @db.Timestamptz(6) // Timestamp when comment was created
-  // updatedAt is used for potential comment edits (optional, but good for ordering/realtime)
-  updatedAt    DateTime            @updatedAt      @map("updated_at") @db.Timestamptz(6)
-
-  user       User                @relation(fields: [userId], references: [id], onDelete: Cascade) // If user deleted, delete their comments
-  template   Template            @relation(fields: [templateId], references: [id], onDelete: Cascade) // If template deleted, delete its comments
+  id         String   @id @default(uuid()) @db.Uuid
+  userId     String   @map("user_id") @db.Uuid
+  templateId String   @map("template_id") @db.Uuid
+  content    String
+  createdAt  DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt  DateTime @updatedAt @map("updated_at") @db.Timestamptz(6)
+  template   Template @relation(fields: [templateId], references: [id], onDelete: Cascade)
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId])
   @@index([templateId])
   @@map("comments")
 }
 
-// 9. Like: Represents a user's "like" on a Template.
 model Like {
-  id           String              @id @default(uuid()) @db.Uuid // Use UUID for consistency (could also use composite PK)
-  userId       String              @db.Uuid       @map("user_id") // Foreign key to the User who liked
-  templateId   String              @db.Uuid       @map("template_id") // Foreign key to the Template being liked
-  createdAt    DateTime            @default(now()) @map("created_at") @db.Timestamptz(6) // Timestamp when the like occurred
+  id         String   @id @default(uuid()) @db.Uuid
+  userId     String   @map("user_id") @db.Uuid
+  templateId String   @map("template_id") @db.Uuid
+  createdAt  DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+  template   Template @relation(fields: [templateId], references: [id], onDelete: Cascade)
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-  user       User                @relation(fields: [userId], references: [id], onDelete: Cascade) // If user deleted, remove their like
-  template   Template            @relation(fields: [templateId], references: [id], onDelete: Cascade) // If template deleted, remove its likes
-
-  @@unique([userId, templateId]) // Ensures a user can only like a template once
-  @@index([userId])       // Index for fetching likes by user
-  @@index([templateId]) // Index for counting likes per template
+  @@unique([userId, templateId])
+  @@index([userId])
+  @@index([templateId])
   @@map("likes")
 }
 
-// 10. TemplateTag (Many-to-Many): Join table linking Templates to Tags.
 model TemplateTag {
-  // Composite primary key using the two foreign keys
-  templateId String @db.Uuid @map("template_id")
-  tagId      String @db.Uuid @map("tag_id")
-
+  templateId String   @map("template_id") @db.Uuid
+  tagId      String   @map("tag_id") @db.Uuid
   assignedAt DateTime @default(now()) @map("assigned_at") @db.Timestamptz(6)
+  tag        Tag      @relation(fields: [tagId], references: [id], onDelete: Cascade)
+  template   Template @relation(fields: [templateId], references: [id], onDelete: Cascade)
 
-  template Template @relation(fields: [templateId], references: [id], onDelete: Cascade) // If template deleted, remove tag link
-  tag      Tag      @relation(fields: [tagId], references: [id], onDelete: Cascade)      // If tag deleted, remove template links
-
-  @@id([templateId, tagId]) // Composite primary key
-  @@index([templateId]) // Index for fetching tags by template
-  @@index([tagId])      // Index for fetching templates by tag
+  @@id([templateId, tagId])
+  @@index([templateId])
+  @@index([tagId])
   @@map("template_tags")
 }
 
-// 11. TemplateAccess (Many-to-Many): Join table for explicitly granting access to restricted templates.
 model TemplateAccess {
-  // Composite primary key using the two foreign keys
-  templateId String @db.Uuid @map("template_id")
-  userId     String @db.Uuid @map("user_id")
-
+  templateId String   @map("template_id") @db.Uuid
+  userId     String   @map("user_id") @db.Uuid
   grantedAt  DateTime @default(now()) @map("granted_at") @db.Timestamptz(6)
+  template   Template @relation(fields: [templateId], references: [id], onDelete: Cascade)
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-  template Template @relation(fields: [templateId], references: [id], onDelete: Cascade) // If template deleted, remove access entry
-  user     User     @relation(fields: [userId], references: [id], onDelete: Cascade)      // If user deleted, remove access entry
-
-  @@id([templateId, userId]) // Composite primary key
-  @@index([templateId]) // Index for fetching users with access to a template
-  @@index([userId])       // Index for fetching templates a user has access to
+  @@id([templateId, userId])
+  @@index([templateId])
+  @@index([userId])
   @@map("template_access")
 }
-        
+
+enum FieldType {
+  STRING
+  TEXT
+  INTEGER
+  CHECKBOX
+}
