@@ -47,7 +47,7 @@ export async function updateSession(request: NextRequest) {
     url.pathname = '/auth/login'
     return NextResponse.redirect(url)
   }
-  if(user && user.email_confirmed_at && request.nextUrl.pathname.startsWith('/auth') && !request.nextUrl.pathname.startsWith('/auth/update-password')) {
+  if(user && user.email_confirmed_at && request.nextUrl.pathname.startsWith('/auth/login') && request.nextUrl.pathname.startsWith('/auth/sign-up')) {
     const url = request.nextUrl.clone()
     url.pathname = '/protected'
     return NextResponse.redirect(url)
