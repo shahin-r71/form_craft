@@ -1,4 +1,4 @@
-import { ThemeToggle } from "@/components/auth/ThemeToggle";
+import { ThemeToggle } from "@/components/theme/ThemeToggle";
 import { Button } from "@/components/ui/button";
 
 export default function Home() {
