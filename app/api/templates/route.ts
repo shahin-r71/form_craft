@@ -24,7 +24,7 @@ export async function POST(request: Request) {
       );
     }
 
-    const { title, description, isPublic, topicId, fields } = result.data;
+    const { title, description, isPublic,imageUrl, topicId, fields } = result.data;
 
     // Create template with fields in a transaction
     const template = await prisma.$transaction(async (tx) => {
@@ -36,6 +36,7 @@ export async function POST(request: Request) {
           isPublic: isPublic ?? true,
           ownerId: user.id,
           topicId,
+          imageUrl,
           templateFields: {
             create: fields.map((field: any, index: number) => ({
               type: field.type,

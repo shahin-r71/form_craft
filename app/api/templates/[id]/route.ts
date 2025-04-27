@@ -2,7 +2,8 @@ import { NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
 // import { createClient } from '@/utils/supabase/server';
 
-export async function GET(request: Request, { params }: { params: { id: string } }) {
+export async function GET(request: Request, props: { params: Promise<{ id: string }> }) {
+  const params = await props.params;
   try {
     const {id} = params;
     const template = await prisma.template.findUnique({

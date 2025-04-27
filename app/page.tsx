@@ -1,6 +1,7 @@
 import { ThemeToggle } from "@/components/theme/ThemeToggle";
 import { Button } from "@/components/ui/button";
 
+
 export default function Home() {
   return (
     <div className="flex h-screen flex-col items-center justify-center">
@@ -14,6 +15,7 @@ export default function Home() {
       <p className="mt-4 text-lg">Have fun coding!</p>
       <Button className="my-4">Click me</Button>
       <ThemeToggle />
+      
     </div>
   );
 }
