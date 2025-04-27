@@ -52,6 +52,11 @@ export async function updateSession(request: NextRequest) {
     url.pathname = '/protected'
     return NextResponse.redirect(url)
   }
+  if(user && !user.email_confirmed_at) {
+    const url = request.nextUrl.clone()
+    url.pathname = '/auth/sign-up-success'
+    return NextResponse.redirect(url)
+  }
 
   // IMPORTANT: You *must* return the supabaseResponse object as it is.
   // If you're creating a new response object with NextResponse.next() make sure to:

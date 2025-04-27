@@ -24,7 +24,7 @@ export const createTemplateSchema = z.object({
     .nullable(),
   isPublic: z.boolean().default(true),
   topicId: z.string().uuid('Invalid topic ID').optional().nullable(),
-  imageUrl: z.string().optional().nullable(),  
+  imageUrl: z.string().optional().nullable(),
   fields: z.array(templateFieldSchema)
     .min(1, 'At least one field is required')
     .max(30, 'Maximum of 30 fields allowed')
@@ -38,6 +38,8 @@ export const createTemplateSchema = z.object({
         path: ['fields']
       }
     ),
+  tags: z.array(z.string().uuid('Invalid tag ID')).optional(),
+  accessUsers: z.array(z.string().uuid('Invalid user ID')).optional(),
 });
 
 export type CreateTemplateInput = z.infer<typeof createTemplateSchema>;

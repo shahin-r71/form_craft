@@ -9,6 +9,7 @@ import { Label } from '@/components/ui/label';
 import { FieldType } from '@prisma/client';
 import { TopicSelector } from './topic-selector';
 import { TagSelector } from './tag-selector';
+import { UserSelector } from './user-selector';
 import { useForm, useFieldArray } from 'react-hook-form';
 import type { Resolver } from 'react-hook-form'
 import type { FieldError } from 'react-hook-form'
@@ -19,8 +20,7 @@ import CoverImage from '@/components/forms/cover-image';
 
 export function TemplateForm() {
   const router = useRouter();
-  const [selectedTags, setSelectedTags] = useState<string[]>([]);
-//   const [imageUrl, setImageUrl] = useState<string|null>(null);
+
 
   const form = useForm<CreateTemplateInput>({
     resolver: zodResolver(createTemplateSchema) as Resolver<
@@ -34,6 +34,8 @@ export function TemplateForm() {
       topicId: null,
       fields: [],
       imageUrl: null,
+      tags: [],
+      accessUsers: []
     }
   });
 
@@ -60,7 +62,8 @@ export function TemplateForm() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           ...data,
-          tags: selectedTags
+          tags: data.tags,
+          accessUsers: data.accessUsers
         })
       });
 
@@ -121,8 +124,11 @@ export function TemplateForm() {
         </div>
 
         <TagSelector
-          selectedTags={selectedTags}
-          onTagsChange={setSelectedTags}
+          selectedTags={form.watch("tags") || []}
+          onTagsChange={(tags) => form.setValue("tags", tags, {
+            shouldValidate: true,
+            shouldDirty: true
+          })}
         />
 
         <div className="space-y-2">
@@ -135,6 +141,16 @@ export function TemplateForm() {
             <span>Make this template public</span>
           </Label>
         </div>
+
+        {!form.watch("isPublic") && (
+          <UserSelector
+            selectedUsers={form.watch("accessUsers") || []}
+            onUsersChange={(users) => form.setValue("accessUsers", users, {
+              shouldValidate: true,
+              shouldDirty: true
+            })}
+          />
+        )}
 
         <div className="space-y-4">
           <h3 className="text-lg font-medium">Form Fields</h3>

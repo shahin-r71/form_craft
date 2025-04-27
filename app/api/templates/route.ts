@@ -24,9 +24,9 @@ export async function POST(request: Request) {
       );
     }
 
-    const { title, description, isPublic,imageUrl, topicId, fields } = result.data;
+    const { title, description, isPublic, imageUrl, topicId, fields, tags, accessUsers } = result.data;
 
-    // Create template with fields in a transaction
+    // Create template with fields, tags, and access grants in a transaction
     const template = await prisma.$transaction(async (tx) => {
       // Create the template
       const template = await tx.template.create({
@@ -46,11 +46,27 @@ export async function POST(request: Request) {
               showInResults: field.showInResults ?? true,
               order: index
             }))
-          }
+          },
+          templateTags: tags ? {
+            create: tags.map((tagId: string) => ({
+              tagId
+            }))
+          } : undefined,
+          accessGrants: !isPublic && accessUsers ? {
+            create: accessUsers.map((userId: string) => ({
+              userId
+            }))
+          } : undefined
         },
         include: {
           templateFields: true,
           topic: true,
+          templateTags: {
+            include: {
+              tag: true
+            }
+          },
+          accessGrants: true,
           owner: {
             select: {
               id: true,
