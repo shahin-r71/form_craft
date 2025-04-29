@@ -1,9 +1,14 @@
+import { UserRoundIcon } from 'lucide-react';
+import { userInfo } from 'os';
 import { z } from 'zod';
 
 export const createCommentSchema = z.object({
   templateId: z.string({
     required_error: 'Template ID is required',
   }).uuid('Invalid template ID'),
+  userId : z.string({
+    required_error: 'User ID is required',
+  }).uuid('Invalid user ID'),
   content: z.string({
     required_error: 'Comment content is required',
   }).min(1, 'Comment cannot be empty')

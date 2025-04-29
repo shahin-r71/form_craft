@@ -18,13 +18,14 @@ export async function POST(request: Request) {
     // Validate request body against Zod schema
     const result = createTemplateSchema.safeParse(body);
     if (!result.success) {
+      console.error('Validation error:', result.error);
       return NextResponse.json(
         { error: result.error.issues[0].message },
         { status: 400 }
       );
     }
 
-    const { title, description, isPublic, imageUrl, topicId, fields, tags, accessUsers } = result.data;
+    const { title, description, isPublic, imageUrl, topicId, templateFields, templateTags, accessGrants } = result.data;
 
     // Create template with fields, tags, and access grants in a transaction
     const template = await prisma.$transaction(async (tx) => {
@@ -38,7 +39,7 @@ export async function POST(request: Request) {
           topicId,
           imageUrl,
           templateFields: {
-            create: fields.map((field: any, index: number) => ({
+            create: templateFields.map((field: any, index: number) => ({
               type: field.type,
               title: field.title,
               description: field.description,
@@ -47,13 +48,13 @@ export async function POST(request: Request) {
               order: index
             }))
           },
-          templateTags: tags ? {
-            create: tags.map((tagId: string) => ({
+          templateTags: templateTags ? {
+            create: templateTags.map((tagId: string) => ({
               tagId
             }))
           } : undefined,
-          accessGrants: !isPublic && accessUsers ? {
-            create: accessUsers.map((userId: string) => ({
+          accessGrants: !isPublic && accessGrants ? {
+            create: accessGrants.map((userId: string) => ({
               userId
             }))
           } : undefined

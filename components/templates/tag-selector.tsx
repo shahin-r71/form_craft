@@ -33,7 +33,7 @@ export function TagSelector({ selectedTags, onTagsChange }: TagSelectorProps) {
         const data = await response.json();
         setTags(data);
         // Initial filter can be empty or based on initial state if needed
-        // setFilteredTags(data); // Removed this, filter effect handles it
+        // setFilteredTags(data); 
       } catch (error) {
         console.error('Error fetching tags:', error);
    

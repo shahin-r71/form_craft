@@ -1,47 +1,51 @@
 'use client';
 
-import { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { useForm, useFieldArray } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import type { Resolver } from 'react-hook-form';
+import type { FieldError } from 'react-hook-form';
+import { FieldType } from '@prisma/client';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { FieldType } from '@prisma/client';
-import { TopicSelector } from './topic-selector';
-import { TagSelector } from './tag-selector';
-import { UserSelector } from './user-selector';
-import { useForm, useFieldArray } from 'react-hook-form';
-import type { Resolver } from 'react-hook-form'
-import type { FieldError } from 'react-hook-form'
-import { zodResolver } from '@hookform/resolvers/zod';
-import { createTemplateSchema, type CreateTemplateInput } from '@/lib/validations/template';
+import { TopicSelector } from '@/components/templates/topic-selector';
+import { TagSelector } from '@/components/templates/tag-selector';
+import { UserSelector } from '@/components/templates/user-selector';
+import CoverImage from '@/components/templates/cover-image';
 import ErrorMsg from '@/components/chore/ErrorMsg';
-import CoverImage from '@/components/forms/cover-image';
+import { TemplateEditFormProps } from '@/types/template';
+import { updateTemplateSchema, type UpdateTemplateInput } from '@/lib/validations/template';
 
-export function TemplateForm() {
+
+
+export function TemplateEditForm({ template }: TemplateEditFormProps) {
   const router = useRouter();
 
-
-  const form = useForm<CreateTemplateInput>({
-    resolver: zodResolver(createTemplateSchema) as Resolver<
-        CreateTemplateInput,
-        any
-        >,
+  const form = useForm<UpdateTemplateInput>({
+    resolver: zodResolver(updateTemplateSchema) as Resolver<UpdateTemplateInput, any>,
     defaultValues: {
-      title: '',
-      description: '',
-      isPublic: true,
-      topicId: null,
-      fields: [],
-      imageUrl: null,
-      tags: [],
-      accessUsers: []
+      title: template.title,
+      description: template.description,
+      isPublic: template.isPublic,
+      topicId: template.topicId,
+      imageUrl: template.imageUrl,
+      templateTags: template.templateTags || [],
+      accessGrants: template.accessGrants || [],
+      templateFields: template.templateFields.map(field => ({
+        type: field.type as "STRING" | "TEXT" | "INTEGER" | "CHECKBOX",
+        title: field.title,
+        description: field.description,
+        required: field.required,
+        showInResults: field.showInResults
+      }))
     }
   });
 
   const { fields, append, remove } = useFieldArray({
     control: form.control,
-    name: 'fields'
+    name: 'templateFields'
   });
 
   const addField = () => {
@@ -54,27 +58,22 @@ export function TemplateForm() {
     });
   };
 
-  const onSubmit = async (data: CreateTemplateInput) => {
-    console.log('Form data:', data);
+  const onSubmit = async (data: UpdateTemplateInput) => {
     try {
-      const response = await fetch('/api/templates', {
-        method: 'POST',
+      const response = await fetch(`/api/templates/${template.id}`, {
+        method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          ...data,
-          tags: data.tags,
-          accessUsers: data.accessUsers
-        })
+        body: JSON.stringify(data)
       });
 
-      if (!response.ok) throw new Error('Failed to create template');
+      if (!response.ok) throw new Error('Failed to update template');
 
-      const template = await response.json();
-      console.log('Template created:', template);
-      router.push(`/templates/${template.id}`);
+      const updatedTemplate = await response.json();
+      router.push(`/templates/${updatedTemplate.id}`);
       router.refresh();
     } catch (error) {
-      console.error('Error creating template:', error);
+      console.error('Error updating template:', error);
+      alert('Failed to update template');
     }
   };
 
@@ -124,8 +123,8 @@ export function TemplateForm() {
         </div>
 
         <TagSelector
-          selectedTags={form.watch("tags") || []}
-          onTagsChange={(tags) => form.setValue("tags", tags, {
+          selectedTags={form.watch("templateTags") || []}
+          onTagsChange={(tags) => form.setValue("templateTags", tags, {
             shouldValidate: true,
             shouldDirty: true
           })}
@@ -144,8 +143,8 @@ export function TemplateForm() {
 
         {!form.watch("isPublic") && (
           <UserSelector
-            selectedUsers={form.watch("accessUsers") || []}
-            onUsersChange={(users) => form.setValue("accessUsers", users, {
+            selectedUsers={form.watch("accessGrants") || []}
+            onUsersChange={(users) => form.setValue("accessGrants", users, {
               shouldValidate: true,
               shouldDirty: true
             })}
@@ -153,10 +152,15 @@ export function TemplateForm() {
         )}
 
         <div className="space-y-4">
-          <h3 className="text-lg font-medium">Form Fields</h3>
+          <div className="flex justify-between items-center">
+            <h3 className="text-lg font-medium">Form Fields</h3>
+            <Button type="button" onClick={addField}>
+              Add Field
+            </Button>
+          </div>
 
           {fields.map((field, index) => {
-            const typeError = form.formState.errors.fields?.[index]?.type;
+            const typeError = form.formState.errors.templateFields?.[index]?.type;
             return (
               <Card key={field.id} className="p-4 space-y-4">
                 <div className="flex justify-between">
@@ -173,7 +177,7 @@ export function TemplateForm() {
                 <div className="space-y-2">
                   <Label>Type</Label>
                   <select
-                    {...form.register(`fields.${index}.type` as const)}
+                    {...form.register(`templateFields.${index}.type` as const)}
                     className="w-full p-2 border rounded dark:bg-accent dark:text-white"
                   >
                     {Object.values(FieldType).map((type) => (
@@ -191,11 +195,11 @@ export function TemplateForm() {
 
                 <div className="space-y-2">
                   <Label>Title</Label>
-                  <Input {...form.register(`fields.${index}.title`)} />
-                  {form.formState.errors.fields?.[index]?.title && (
+                  <Input {...form.register(`templateFields.${index}.title`)} />
+                  {form.formState.errors.templateFields?.[index]?.title && (
                     <ErrorMsg
                       message={
-                        form.formState.errors.fields[index].title?.message
+                        form.formState.errors.templateFields[index].title?.message
                       }
                     />
                   )}
@@ -203,11 +207,11 @@ export function TemplateForm() {
 
                 <div className="space-y-2">
                   <Label>Description</Label>
-                  <Input {...form.register(`fields.${index}.description`)} />
-                  {form.formState.errors.fields?.[index]?.description && (
+                  <Input {...form.register(`templateFields.${index}.description`)} />
+                  {form.formState.errors.templateFields?.[index]?.description && (
                     <ErrorMsg
                       message={
-                        form.formState.errors.fields[index].description?.message
+                        form.formState.errors.templateFields[index].description?.message
                       }
                     />
                   )}
@@ -217,50 +221,35 @@ export function TemplateForm() {
                   <Label className="flex items-center space-x-2">
                     <input
                       type="checkbox"
-                      {...form.register(`fields.${index}.required`)}
+                      {...form.register(`templateFields.${index}.required`)}
                       className="h-4 w-4"
                     />
-                    <span>Required field</span>
+                    <span>Required</span>
                   </Label>
                 </div>
 
                 <div className="space-y-2">
-                  {/* todo: think about this feature later */}
-                  {/* <Label className="flex items-center space-x-2">
+                  <Label className="flex items-center space-x-2">
                     <input
                       type="checkbox"
-                      {...form.register(`fields.${index}.showInResults`)}
+                      {...form.register(`templateFields.${index}.showInResults`)}
                       className="h-4 w-4"
                     />
-                    <span>Show in results</span>
-                  </Label> */}
+                    <span>Show in Results</span>
+                  </Label>
                 </div>
               </Card>
             );
           })}
-          {form.formState.errors.fields?.message && (
-            <ErrorMsg message={form.formState.errors.fields.message} />
+
+          {form.formState.errors.templateFields?.length === 0 && (
+            <ErrorMsg message="At least one field is required" />
           )}
         </div>
 
-        <div className="flex flex-col gap-4 items-center mt-8">
-          <Button
-            type="button"
-            onClick={addField}
-            className="w-full max-w-xs"
-            variant="outline"
-          >
-            Add New Field
-          </Button>
-
-          <Button
-            type="submit"
-            disabled={form.formState.isSubmitting}
-            className="w-full max-w-xs"
-          >
-            {form.formState.isSubmitting ? "Creating..." : "Create Template"}
-          </Button>
-        </div>
+        <Button type="submit" className="w-full">
+          Update Template
+        </Button>
       </form>
     </Card>
   );

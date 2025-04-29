@@ -14,7 +14,7 @@ export const templateFieldSchema = z.object({
   showInResults: z.boolean().default(true),
 });
 
-export const createTemplateSchema = z.object({
+const templateBaseSchema = z.object({
   title: z.string()
     .min(3, 'Title must be at least 3 characters')
     .max(200, 'Title must be less than 200 characters'),
@@ -25,7 +25,7 @@ export const createTemplateSchema = z.object({
   isPublic: z.boolean().default(true),
   topicId: z.string().uuid('Invalid topic ID').optional().nullable(),
   imageUrl: z.string().optional().nullable(),
-  fields: z.array(templateFieldSchema)
+  templateFields: z.array(templateFieldSchema)
     .min(1, 'At least one field is required')
     .max(30, 'Maximum of 30 fields allowed')
     .refine(
@@ -38,9 +38,18 @@ export const createTemplateSchema = z.object({
         path: ['fields']
       }
     ),
-  tags: z.array(z.string().uuid('Invalid tag ID')).optional(),
-  accessUsers: z.array(z.string().uuid('Invalid user ID')).optional(),
+});
+
+export const createTemplateSchema = templateBaseSchema.extend({
+  templateTags: z.array(z.string().uuid('Invalid tag ID')).optional(),
+  accessGrants: z.array(z.string().uuid('Invalid user ID')).optional(),
+});
+
+export const updateTemplateSchema = templateBaseSchema.extend({
+  templateTags: z.array(z.string().uuid('Invalid tag ID')).optional(),
+  accessGrants: z.array(z.string().uuid('Invalid user ID')).optional(),
 });
 
 export type CreateTemplateInput = z.infer<typeof createTemplateSchema>;
+export type UpdateTemplateInput = z.infer<typeof updateTemplateSchema>;
 export type TemplateFieldInput = z.infer<typeof templateFieldSchema>;

@@ -42,7 +42,7 @@ export default function CoverImage({value, onChange}: coverImgProps) {
             }
             toast.success("Successfully uploaded!", {
               position: "top-center",
-              autoClose: 1600,
+              autoClose: 3000,
             });
              widget.close();
           }}

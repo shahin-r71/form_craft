@@ -1,4 +1,4 @@
-import { TemplateForm } from '@/components/forms/template-form';
+import { TemplateForm } from '@/components/templates/template-form';
 
 export default function CreateTemplatePage() {
   return (
