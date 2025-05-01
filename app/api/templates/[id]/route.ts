@@ -97,15 +97,71 @@ export async function PUT(request: Request, props: { params: Promise<{ id: strin
     if (existingTemplate.ownerId !== user.id) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 403 });
     }
+    // Create a set to track which existing fields are being kept
+    const fieldsToKeep = new Set<string>();
 
     // Update template and fields in a transaction
     const updatedTemplate = await prisma.$transaction(async (tx) => {
-      // Delete existing fields
-      await tx.templateField.deleteMany({
-        where: { templateId: id }
+      
+      // Process template fields - update existing ones and prepare new ones
+      const fieldUpdates = templateFields.map(async (field: any, index: number) => {
+        // If field has an id and exists in our database, update it
+        if (field.id) {
+          const existingField = await tx.templateField.findUnique({
+            where: { id: field.id, templateId: id }
+          });
+          
+          if (existingField) {
+            fieldsToKeep.add(existingField.id);
+            return tx.templateField.update({
+              where: { id: field.id },
+              data: {
+                type: field.type,
+                title: field.title,
+                description: field.description,
+                required: field.required ?? false,
+                showInResults: field.showInResults ?? true,
+                order: index
+              }
+            });
+          }
+        }
+
+        // Otherwise create a new field
+        const newField = await tx.templateField.create({
+            data: {
+              templateId: id,
+              type: field.type,
+              title: field.title,
+              description: field.description,
+              required: field.required ?? false,
+              showInResults: field.showInResults ?? true,
+              order: index
+            },
+            select: {
+              id: true
+            }
+          });
+          
+          fieldsToKeep.add(newField.id);
+          return newField;
       });
 
-      // Update template and create new fields
+      
+      // Execute all field updates
+      await Promise.all(fieldUpdates);
+      
+      // Delete fields that are no longer needed
+      await tx.templateField.deleteMany({
+        where: {
+          templateId: id,
+          id: {
+            notIn: Array.from(fieldsToKeep)
+          }
+        }
+      });
+
+      // Update template
       const template = await tx.template.update({
         where: { id },
         data: {
@@ -125,16 +181,6 @@ export async function PUT(request: Request, props: { params: Promise<{ id: strin
             create: accessGrants?.map((userId: string) => ({
               userId
             })) || []
-          },
-          templateFields: {
-            create: templateFields.map((field: any, index: number) => ({
-              type: field.type,
-              title: field.title,
-              description: field.description,
-              required: field.required ?? false,
-              showInResults: field.showInResults ?? true,
-              order: index
-            }))
           }
         },
         include: {
@@ -162,7 +208,11 @@ export async function PUT(request: Request, props: { params: Promise<{ id: strin
       });
 
       return template;
-    });
+    },
+    {
+    timeout: 10000 // Increase timeout to 10 seconds
+   }  
+  );
     return NextResponse.json(updatedTemplate);
   } catch (error) {
     console.error('Error updating template:', error);

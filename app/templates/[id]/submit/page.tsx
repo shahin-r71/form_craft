@@ -46,8 +46,6 @@ export default function SubmitTemplatePage() {
   }, [id]);
 
 
-  // Create validation schema using the existing validation utilities
- 
 
   // Create form once template is loaded
   const form = useForm<any>({

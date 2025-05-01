@@ -3,7 +3,7 @@ import { z } from 'zod';
 import prisma from '@/lib/prisma';
 import { createClient } from '@/utils/supabase/server';
 import {submissionSchema} from '@/lib/validations/submission';
-// Validation schema for field submissions
+
 
 
 export async function POST(request: Request) {

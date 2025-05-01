@@ -17,7 +17,7 @@ import CoverImage from '@/components/templates/cover-image';
 import ErrorMsg from '@/components/chore/ErrorMsg';
 import { TemplateEditFormProps } from '@/types/template';
 import { updateTemplateSchema, type UpdateTemplateInput } from '@/lib/validations/template';
-
+import { toast } from 'react-toastify'
 
 
 export function TemplateEditForm({ template }: TemplateEditFormProps) {
@@ -34,6 +34,7 @@ export function TemplateEditForm({ template }: TemplateEditFormProps) {
       templateTags: template.templateTags || [],
       accessGrants: template.accessGrants || [],
       templateFields: template.templateFields.map(field => ({
+        id: field.id,
         type: field.type as "STRING" | "TEXT" | "INTEGER" | "CHECKBOX",
         title: field.title,
         description: field.description,
@@ -71,9 +72,10 @@ export function TemplateEditForm({ template }: TemplateEditFormProps) {
       const updatedTemplate = await response.json();
       router.push(`/templates/${updatedTemplate.id}`);
       router.refresh();
+      toast.success('Template updated successfully');
     } catch (error) {
       console.error('Error updating template:', error);
-      alert('Failed to update template');
+      toast.error('Failed to update template');
     }
   };
 
@@ -154,9 +156,7 @@ export function TemplateEditForm({ template }: TemplateEditFormProps) {
         <div className="space-y-4">
           <div className="flex justify-between items-center">
             <h3 className="text-lg font-medium">Form Fields</h3>
-            <Button type="button" onClick={addField}>
-              Add Field
-            </Button>
+            
           </div>
 
           {fields.map((field, index) => {
@@ -246,10 +246,14 @@ export function TemplateEditForm({ template }: TemplateEditFormProps) {
             <ErrorMsg message="At least one field is required" />
           )}
         </div>
-
-        <Button type="submit" className="w-full">
-          Update Template
-        </Button>
+        <div className='flex flex-col justify-between items-center gap-4 md:flex-row'>
+            <Button type="button" className='w-1/2' onClick={addField}>
+                Add Field
+            </Button>
+            <Button type="submit" className="w-1/2">
+            Update Template
+            </Button>
+        </div>
       </form>
     </Card>
   );

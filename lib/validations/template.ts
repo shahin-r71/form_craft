@@ -2,6 +2,7 @@ import { z } from 'zod';
 import { FieldType } from '@prisma/client';
 
 export const templateFieldSchema = z.object({
+  id: z.string().uuid('Invalid field ID').optional(),
   type: z.nativeEnum(FieldType),
   title: z.string()
     .min(1, 'Title is required')

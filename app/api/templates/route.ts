@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
 import { createClient } from '@/utils/supabase/server';
-import { createTemplateSchema } from '@/lib/validations/template';
+import { createTemplateSchema, updateTemplateSchema } from '@/lib/validations/template';
 
 export async function POST(request: Request) {
   try {
@@ -97,11 +97,12 @@ export async function GET(request: Request) {
     const topicId = searchParams.get('topicId');
     const userId = searchParams.get('userId');
     const isPublic = searchParams.get('isPublic');
+    const ownerId = searchParams.get('ownerId');
 
     const templates = await prisma.template.findMany({
       where: {
         ...(topicId && { topicId }),
-        ...(userId && { ownerId: userId }),
+        ...(ownerId && { ownerId: ownerId }),
         ...(isPublic !== null && { isPublic: isPublic === 'true' })
       },
       include: {
@@ -136,3 +137,5 @@ export async function GET(request: Request) {
     );
   }
 }
+
+   

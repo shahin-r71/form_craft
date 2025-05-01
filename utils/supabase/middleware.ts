@@ -49,7 +49,7 @@ export async function updateSession(request: NextRequest) {
   }
   if(user && user.email_confirmed_at && request.nextUrl.pathname.startsWith('/auth/login') && request.nextUrl.pathname.startsWith('/auth/sign-up')) {
     const url = request.nextUrl.clone()
-    url.pathname = '/protected'
+    url.pathname = '/dashboard'
     return NextResponse.redirect(url)
   }
   if(user && !user.email_confirmed_at) {
