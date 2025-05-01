@@ -37,22 +37,29 @@ export async function updateSession(request: NextRequest) {
     data: { user },
   } = await supabase.auth.getUser()
 
+  const isApiRoute = request.nextUrl.pathname.startsWith('/api')
+
   if (
     !user &&
+    !isApiRoute && // Don't redirect API routes for unauthenticated users
     request.nextUrl.pathname !== '/' &&
     !request.nextUrl.pathname.startsWith('/auth')
   ) {
-    // no user, not in homeroute, in any route other than login or sign-up, potentially respond by redirecting the user to the login page
+    // no user, not on an API route, not in homeroute, not in auth routes -> redirect to login
     const url = request.nextUrl.clone()
     url.pathname = '/auth/login'
     return NextResponse.redirect(url)
   }
-  if(user && user.email_confirmed_at && request.nextUrl.pathname.startsWith('/auth/login') && request.nextUrl.pathname.startsWith('/auth/sign-up')) {
+
+  // Redirect logged-in, confirmed users away from login/sign-up
+  if(user && user.email_confirmed_at && (request.nextUrl.pathname.startsWith('/auth/login') || request.nextUrl.pathname.startsWith('/auth/sign-up'))) {
     const url = request.nextUrl.clone()
     url.pathname = '/dashboard'
     return NextResponse.redirect(url)
   }
-  if(user && !user.email_confirmed_at) {
+
+  // Redirect logged-in, unconfirmed users to the sign-up success/confirmation page, unless they are already there or trying to confirm
+  if(user && !user.email_confirmed_at && !request.nextUrl.pathname.startsWith('/auth/sign-up-success') && !request.nextUrl.pathname.startsWith('/auth/confirm')) {
     const url = request.nextUrl.clone()
     url.pathname = '/auth/sign-up-success'
     return NextResponse.redirect(url)
