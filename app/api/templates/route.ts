@@ -98,13 +98,26 @@ export async function GET(request: Request) {
     const userId = searchParams.get('userId');
     const isPublic = searchParams.get('isPublic');
     const ownerId = searchParams.get('ownerId');
+    const sort = searchParams.get('sort') || 'latest'; // 'latest' or 'popular'
+    const limit = Number(searchParams.get('limit')) || undefined;
+
+    const baseWhere = {
+      ...(topicId && { topicId }),
+      ...(ownerId && { ownerId: ownerId }),
+      ...(isPublic !== null && { isPublic: isPublic === 'true' })
+    };
+
+    let orderBy: any = { createdAt: 'desc' };
+    if (sort === 'popular') {
+      orderBy = {
+        submissions: {
+          _count: 'desc'
+        }
+      };
+    }
 
     const templates = await prisma.template.findMany({
-      where: {
-        ...(topicId && { topicId }),
-        ...(ownerId && { ownerId: ownerId }),
-        ...(isPublic !== null && { isPublic: isPublic === 'true' })
-      },
+      where: baseWhere,
       include: {
         templateFields: true,
         topic: true,
@@ -123,9 +136,8 @@ export async function GET(request: Request) {
           }
         }
       },
-      orderBy: {
-        createdAt: 'desc'
-      }
+      orderBy,
+      take: limit
     });
 
     return NextResponse.json(templates);
