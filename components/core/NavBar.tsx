@@ -58,8 +58,7 @@ export default function NavBar() {
             onChange={(e) => console.log('Language changed:', e.target.value)}
           >
             <option value="en">EN</option>
-            <option value="es">ES</option>
-            <option value="fr">FR</option>
+            <option value="bn">BN</option>
           </select>
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
