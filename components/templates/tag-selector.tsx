@@ -5,6 +5,8 @@ import { Label } from '@/components/ui/label';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import { X, Loader2 } from 'lucide-react';
+import { useTranslations } from 'next-intl';
+import { toast } from 'react-toastify'; 
 
 interface Tag {
   id: string;
@@ -17,6 +19,7 @@ interface TagSelectorProps {
 }
 
 export function TagSelector({ selectedTags, onTagsChange }: TagSelectorProps) {
+  const t = useTranslations('TagSelector'); // Initialize translations
   const [tags, setTags] = useState<Tag[]>([]);
   const [isLoading, setIsLoading] = useState(true); 
   const [inputValue, setInputValue] = useState('');
@@ -29,13 +32,14 @@ export function TagSelector({ selectedTags, onTagsChange }: TagSelectorProps) {
       setIsLoading(true); 
       try {
         const response = await fetch('/api/tags');
-        if (!response.ok) throw new Error('Failed to fetch tags');
+        if (!response.ok) throw new Error(t('errorFetchTags')); // Use translation
         const data = await response.json();
         setTags(data);
         // Initial filter can be empty or based on initial state if needed
         // setFilteredTags(data); 
       } catch (error) {
         console.error('Error fetching tags:', error);
+        toast.error(t('errorFetchTags')); // Use translation
    
       } finally {
         setIsLoading(false);
@@ -87,7 +91,9 @@ export function TagSelector({ selectedTags, onTagsChange }: TagSelectorProps) {
       if (!response.ok) {
           // Handle specific errors maybe? e.g., tag already exists
           const errorData = await response.text(); // Or response.json() if API returns JSON error
-          throw new Error(`Failed to create tag: ${response.statusText} (${errorData})`);
+          const errorStatus = response.statusText || 'unknown';
+          toast.error(t('errorCreateTag', { errorStatus })); // Use translation
+          throw new Error(`Failed to create tag: ${errorStatus} (${errorData})`);
       }
 
       const newTag: Tag = await response.json();
@@ -102,7 +108,7 @@ export function TagSelector({ selectedTags, onTagsChange }: TagSelectorProps) {
       handleTagSelect(newTag.id);
     } catch (error) {
       console.error('Error creating tag:', error);
-      // Optionally show an error message to the user
+      // Error is already shown via toast
     } finally {
       setIsCreatingTag(false);
       // Input is cleared by handleTagSelect called on success
@@ -119,6 +125,9 @@ export function TagSelector({ selectedTags, onTagsChange }: TagSelectorProps) {
     return tagNameMap.get(tagId) || '';
   };
 
+  // Get selected tag names for display
+  const selectedTagNames = selectedTags.map(id => getTagName(id)).filter(Boolean);
+
   // Determine if the exact match exists for the create button logic
   const exactMatchExists = filteredTags.some(tag =>
     tag.name.toLowerCase() === inputValue.trim().toLowerCase()
@@ -127,29 +136,31 @@ export function TagSelector({ selectedTags, onTagsChange }: TagSelectorProps) {
 
   return (
     <div className="space-y-2">
-      <Label htmlFor="tags">Tags</Label>
-      <div className="space-y-2">
-        <div className="flex flex-wrap gap-2 min-h-[28px]"> {/* Added min-height */}
+      <Label htmlFor="tags">{t('label')}</Label>
+      {/* Display selected tags */}
+      {selectedTagNames.length > 0 && (
+        <div className="flex flex-wrap gap-2 min-h-[28px] p-2 bg-muted/30 rounded-lg border border-dashed">
           {selectedTags.map((tagId) => (
-            <Badge key={tagId} variant="secondary" className="flex items-center gap-1 whitespace-nowrap"> {/* Added whitespace-nowrap */}
+            <Badge key={tagId} variant="secondary" className="flex items-center gap-1 whitespace-nowrap">
               {getTagName(tagId)}
               <button
                 type="button"
                 onClick={() => handleTagRemove(tagId)}
-                className="text-muted-foreground hover:text-foreground focus:outline-none rounded-full" // Added focus style
-                aria-label={`Remove tag ${getTagName(tagId)}`} // Added aria-label
+                className="text-muted-foreground hover:text-foreground focus:outline-none rounded-full"
+                aria-label={t('removeTagAriaLabel', { tagName: getTagName(tagId) })}
               >
                 <X className="h-3 w-3" />
               </button>
             </Badge>
           ))}
         </div>
-        <div className="relative">
-          <Input
-            id="tags"
-            value={inputValue}
+      )}
+      <div className="relative">
+        <Input
+          id="tags"
+          placeholder={t('placeholder')}
+          value={inputValue}
             onChange={(e) => setInputValue(e.target.value)}
-            placeholder="Type to search or create tags..." 
             disabled={isLoading} // Disable only during initial load
             aria-autocomplete="list" 
             aria-controls="tag-suggestions" 
@@ -181,20 +192,19 @@ export function TagSelector({ selectedTags, onTagsChange }: TagSelectorProps) {
                   {isCreatingTag ? (
                     <>
                       <Loader2 className="h-4 w-4 animate-spin" />
-                      Creating... 
+                      {t('creatingButtonText')} {/* Use translation */}
                     </>
                   ) : (
-                    `Create tag "${inputValue.trim()}"` // Normal Text
+                    t('createButtonText', { tagName: inputValue.trim() }) // Use translation
                   )}
                 </button>
               )}
               {/*  Show message if input has text but no results/create option */}
               {inputValue.trim() && filteredTags.length === 0 && !showCreateButton && (
-                 <div className="px-4 py-2 text-sm text-muted-foreground">No matching tags found.</div>
+                 <div className="px-4 py-2 text-sm text-muted-foreground">{t('noResultsText')}</div> // Use translation
               )}
             </div>
           )}
-        </div>
       </div>
     </div>
   );

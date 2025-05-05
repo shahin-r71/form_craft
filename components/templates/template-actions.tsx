@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { MoreVertical, Edit, Trash } from 'lucide-react';
+import { useTranslations } from 'next-intl'; // Import useTranslations
 
 interface TemplateActionsProps {
   templateId: string;
@@ -13,6 +14,7 @@ interface TemplateActionsProps {
 }
 
 export function TemplateActions({ templateId, ownerId, currentUserId }: TemplateActionsProps) {
+  const t = useTranslations('TemplateActions'); // Initialize translations
   const router = useRouter();
   const [isDeleting, setIsDeleting] = useState(false);
 
@@ -21,7 +23,7 @@ export function TemplateActions({ templateId, ownerId, currentUserId }: Template
   };
 
   const handleDelete = async () => {
-    if (!confirm('Are you sure you want to delete this template?')) return;
+    if (!confirm(t('confirmDelete'))) return; // Use translation
 
     try {
       setIsDeleting(true);
@@ -29,13 +31,13 @@ export function TemplateActions({ templateId, ownerId, currentUserId }: Template
         method: 'DELETE',
       });
 
-      if (!response.ok) throw new Error('Failed to delete template');
+      if (!response.ok) throw new Error(t('errorDeleteFailed')); // Use translation
 
       router.push('/templates');
       router.refresh();
     } catch (error) {
       console.error('Error deleting template:', error);
-      alert('Failed to delete template');
+      alert(t('errorDeleteFailed')); // Use translation
     } finally {
       setIsDeleting(false);
     }
@@ -48,13 +50,13 @@ export function TemplateActions({ templateId, ownerId, currentUserId }: Template
       <DropdownMenuTrigger asChild>
         <Button variant="ghost" size="icon">
           <MoreVertical className="h-4 w-4" />
-          <span className="sr-only">Open menu</span>
+          <span className="sr-only">{t('openMenu')}</span> {/* Use translation */}
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end">
         <DropdownMenuItem onClick={handleEdit}>
           <Edit className="mr-2 h-4 w-4" />
-          Edit
+          {t('editAction')} {/* Use translation */}
         </DropdownMenuItem>
         <DropdownMenuItem 
           onClick={handleDelete}
@@ -62,7 +64,7 @@ export function TemplateActions({ templateId, ownerId, currentUserId }: Template
           className="text-red-600 focus:text-red-600"
         >
           <Trash className="mr-2 h-4 w-4" />
-          {isDeleting ? 'Deleting...' : 'Delete'}
+          {isDeleting ? t('deletingState') : t('deleteAction')} {/* Use translation */}
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>

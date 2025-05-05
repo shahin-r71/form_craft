@@ -1,0 +1,285 @@
+{
+  "Navbar": {
+    "searchPlaceholder": "টেমপ্লেট খুঁজুন...",
+    "logoPart1": "ফর্ম",
+    "logoPart2": "ক্র্যাফট",
+    "dashboardLink": "ড্যাশবোর্ড",
+    "langEnglish": "EN",
+    "langBengali": "BN",
+    "loginButton": "লগইন"
+  },
+  "TemplateGallery": {
+    "startBlank": "একটি খালি ফর্ম শুরু করুন",
+    "goToFormPage": "আরও তথ্যের জন্য ফর্ম পৃষ্ঠায় যান",
+    "errorFetchTemplates": "টেমপ্লেট আনতে ব্যর্থ হয়েছে"
+  },
+  "PopularForms": {
+    "goToFormPage": "আরও তথ্যের জন্য ফর্ম পৃষ্ঠায় যান",
+    "errorFetchForms": "ফর্ম আনতে ব্যর্থ হয়েছে"
+  },
+  "Footer": {
+    "product": "পণ্য",
+    "company": "কোম্পানি",
+    "legal": "আইনি",
+    "formCraft": "ফর্মক্র্যাফট",
+    "allRightsReserved": "সর্বস্বত্ব সংরক্ষিত।"
+  },
+  "Auth": {
+    "loginTitle": "লগইন",
+    "loginDescription": "আপনার অ্যাকাউন্টে লগইন করতে নীচে আপনার ইমেল লিখুন",
+    "emailLabel": "ইমেল",
+    "passwordLabel": "পাসওয়ার্ড",
+    "forgotPasswordLink": "আপনার পাসওয়ার্ড ভুলে গেছেন?",
+    "loggingInButton": "লগইন হচ্ছে...",
+    "emailPlaceholder": "m@example.com",
+    "signUpTitle": "সাইন আপ",
+    "signUpDescription": "একটি নতুন অ্যাকাউন্ট তৈরি করুন",
+    "signUpButton": "সাইন আপ",
+    "creatingAccountButton": "অ্যাকাউন্ট তৈরি করা হচ্ছে...",
+    "alreadyHaveAccountPrompt": "ইতিমধ্যে একটি অ্যাকাউন্ট আছে?",
+    "passwordsDoNotMatchError": "পাসওয়ার্ড মিলছে না",
+    "repeatPasswordLabel": "পাসওয়ার্ড পুনরায় লিখুন",
+    "logoutButton": "লগআউট",
+    "signUpSuccessTitle": "সাইন আপ করার জন্য ধন্যবাদ!",
+    "signUpSuccessDescription": "নিশ্চিত করতে আপনার ইমেল চেক করুন",
+    "resetPasswordTitle": "আপনার পাসওয়ার্ড রিসেট করুন",
+    "newPasswordLabel": "নতুন পাসওয়ার্ড",
+    "newPasswordPlaceholder": "নতুন পাসওয়ার্ড",
+    "checkEmailTitle": "আপনার ইমেল চেক করুন",
+    "checkEmailDescription": "পাসওয়ার্ড রিসেট নির্দেশাবলী পাঠানো হয়েছে",
+    "checkEmailInfo": "আপনি যদি আপনার ইমেল এবং পাসওয়ার্ড ব্যবহার করে নিবন্ধন করে থাকেন, আপনি একটি পাসওয়ার্ড রিসেট ইমেল পাবেন।",
+    "resetPasswordDescription": "আপনার ইমেল টাইপ করুন এবং আমরা আপনাকে আপনার পাসওয়ার্ড রিসেট করার জন্য একটি লিঙ্ক পাঠাব",
+    "sendingButton": "পাঠানো হচ্ছে...",
+    "sendResetEmailButton": "রিসেট ইমেল পাঠান",
+    "updatePasswordDescription": "দয়া করে নীচে আপনার নতুন পাসওয়ার্ড লিখুন।",
+    "savingButton": "সংরক্ষণ করা হচ্ছে...",
+    "saveNewPasswordButton": "নতুন পাসওয়ার্ড সংরক্ষণ করুন",
+    "authErrorTitle": "দুঃখিত, কিছু ভুল হয়েছে।",
+    "authErrorDescription": "একটি অনির্দিষ্ট ত্রুটি ঘটেছে।",
+    "authErrorCodeLabel": "কোড:",
+    "noAccountPrompt": "কোন অ্যাকাউন্ট নেই?"
+  },
+  "TemplateDetail": {
+    "loadingText": "লোড হচ্ছে...",
+    "errorGeneric": "একটি ত্রুটি ঘটেছে",
+    "templateNotFound": "টেমপ্লেট পাওয়া যায়নি",
+    "createdBy": "তৈরি করেছেন:",
+    "anonymousUser": "বেনামী",
+    "topicLabel": "বিষয়:",
+    "templateFieldsTitle": "টেমপ্লেট ফিল্ড",
+    "fieldTypeLabel": "ধরন:",
+    "requiredLabel": "প্রয়োজনীয়",
+    "optionalLabel": "ঐচ্ছিক",
+    "shownInResultsLabel": "ফলাফলে দেখানো হয়েছে",
+    "hiddenInResultsLabel": "ফলাফলে লুকানো",
+    "submissionsLabel": "জমা",
+    "likesLabel": "পছন্দ",
+    "commentsLabel": "মন্তব্য",
+    "fillOutFormButton": "ফর্ম পূরণ করুন",
+    "viewSubmissionsButton": "জমা দেখুন",
+    "likeButton": "পছন্দ",
+    "likesButton": "পছন্দ",
+    "commentsTitle": "মন্তব্য ({count})",
+    "addCommentPlaceholder": "একটি মন্তব্য যোগ করুন...",
+    "postCommentButton": "মন্তব্য পোস্ট করুন",
+    "postingCommentButton": "পোস্ট করা হচ্ছে...",
+    "signInToCommentPrompt": "মন্তব্য করতে দয়া করে সাইন ইন করুন",
+    "loadMoreCommentsButton": "আরও মন্তব্য লোড করুন",
+    "formSubmittedSuccess": "ফর্ম সফলভাবে জমা দেওয়া হয়েছে! আপনার জমা দেওয়ার জন্য ধন্যবাদ।",
+    "commentAddedSuccess": "মন্তব্য সফলভাবে যোগ করা হয়েছে।",
+    "errorFetchingTemplate": "টেমপ্লেট বিবরণ আনতে ত্রুটি।",
+    "errorSubmittingForm": "ফর্ম জমা দিতে ত্রুটি।",
+    "errorAddingComment": "মন্তব্য যোগ করতে ত্রুটি।",
+    "errorLikingTemplate": "টেমপ্লেট পছন্দ করতে ত্রুটি।",
+    "errorGenericLike": "আবার চেষ্টা করার আগে কিছু শ্বাস নিন..."
+  },
+  "Dashboard": {
+    "templatesCreatedTab": "তৈরি করা টেমপ্লেট",
+    "templatesFilledTab": "পূরণ করা টেমপ্লেট",
+    "yourTemplatesTitle": "আপনার টেমপ্লেট",
+    "noTemplatesCreated": "আপনি এখনও কোন টেমপ্লেট তৈরি করেননি।",
+    "templatesFilledTitle": "আপনি যে টেমপ্লেটগুলি পূরণ করেছেন",
+    "noTemplatesFilled": "আপনি এখনও কোন টেমপ্লেট পূরণ করেননি।",
+    "viewSubmissionButton": "জমা দেখুন",
+    "createNewTemplateButton": "নতুন টেমপ্লেট তৈরি করুন",
+    "createFirstTemplateButton": "আপনার প্রথম টেমপ্লেট তৈরি করুন",
+    "viewTemplateButton": "টেমপ্লেট দেখুন",
+    "submissionsCount": "{count, plural, =0 {কোন জমা নেই} one {# জমা} other {# জমা}}",
+    "errorNotAuthenticated": "প্রমাণীকৃত নয়",
+    "errorFetchCreatedTemplates": "তৈরি করা টেমপ্লেট আনতে ব্যর্থ হয়েছে",
+    "errorFetchFilledTemplates": "পূরণ করা টেমপ্লেট আনতে ব্যর্থ হয়েছে",
+    "errorGeneric": "একটি ত্রুটি ঘটেছে",
+    "userNameFallback": "ব্যবহারকারী",
+    "viewButton": "দেখুন",
+    "editButton": "সম্পাদনা",
+    "submissionsButton": "জমা",
+    "submittedOnLabel": "জমা দেওয়া হয়েছে:"
+  },
+  "TemplateCreate": {
+    "title": "নতুন ফর্ম টেমপ্লেট তৈরি করুন"
+  },
+  "TemplateEdit": {
+    "title": "ফর্ম টেমপ্লেট সম্পাদনা করুন",
+    "notFound": "টেমপ্লেট পাওয়া যায়নি"
+  },
+  "TemplateView": {
+    "notFound": "টেমপ্লেট পাওয়া যায়নি",
+    "fieldsTitle": "টেমপ্লেট ফিল্ড",
+    "addCommentPlaceholder": "একটি মন্তব্য যোগ করুন...",
+    "signInToComment": "মন্তব্য করতে দয়া করে সাইন ইন করুন",
+    "postCommentButton": "মন্তব্য পোস্ট করুন",
+    "postingCommentButton": "পোস্ট করা হচ্ছে..."
+  },
+  "TemplateForm": {
+    "titleLabel": "শিরোনাম",
+    "descriptionLabel": "বিবরণ",
+    "makePublicLabel": "এই টেমপ্লেটটি সর্বজনীন করুন",
+    "formFieldsTitle": "ফর্ম ফিল্ড",
+    "typeLabel": "ধরন",
+    "requiredLabel": "প্রয়োজনীয় ফিল্ড",
+    "showInResultsLabel": "ফলাফলে দেখান"
+  },
+  "TemplateEditForm": {
+    "titleLabel": "শিরোনাম",
+    "descriptionLabel": "বিবরণ",
+    "makePublicLabel": "এই টেমপ্লেটটি সর্বজনীন করুন",
+    "formFieldsTitle": "ফর্ম ফিল্ড",
+    "typeLabel": "ধরন",
+    "requiredLabel": "প্রয়োজনীয়",
+    "showInResultsLabel": "ফলাফলে দেখান",
+    "coverImageLabel": "কভার ইমেজ (ঐচ্ছিক)",
+    "removeButton": "অপসারণ",
+    "fieldLabel": "ফিল্ড {index}",
+    "addFieldButton": "ফিল্ড যোগ করুন",
+    "createTemplateButton": "টেমপ্লেট তৈরি করুন",
+    "creatingTemplateButton": "তৈরি করা হচ্ছে...",
+    "updateTemplateButton": "টেমপ্লেট আপডেট করুন",
+    "errorFailedToCreate": "টেমপ্লেট তৈরি করতে ব্যর্থ হয়েছে",
+    "errorFailedToUpdate": "টেমপ্লেট আপডেট করতে ব্যর্থ হয়েছে",
+    "templateUpdatedSuccess": "টেমপ্লেট সফলভাবে আপডেট করা হয়েছে",
+    "atLeastOneFieldRequired": "কমপক্ষে একটি ফিল্ড প্রয়োজন"
+  },
+  "CoverImage": {
+    "uploadSuccess": "সফলভাবে আপলোড করা হয়েছে!",
+    "uploadPrompt": "কভার ইমেজ আপলোড করতে ক্লিক করুন",
+    "sizeRecommendation": "প্রস্তাবিত আকার: 1200 x 400px"
+  },
+  "TagSelector": {
+    "label": "ট্যাগ",
+    "placeholder": "ট্যাগ খুঁজতে বা তৈরি করতে টাইপ করুন...",
+    "removeTagAriaLabel": "ট্যাগ {tagName} অপসারণ করুন",
+    "createButtonText": "ট্যাগ \"{tagName}\" তৈরি করুন",
+    "creatingButtonText": "তৈরি করা হচ্ছে...",
+    "noResultsText": "কোন মিলে যাওয়া ট্যাগ পাওয়া যায়নি।",
+    "errorFetchTags": "ট্যাগ আনতে ব্যর্থ হয়েছে",
+    "errorCreateTag": "ট্যাগ তৈরি করতে ব্যর্থ হয়েছে: {errorStatus}",
+    "tagsLabel": "ট্যাগ",
+    "searchPlaceholder": "ট্যাগ খুঁজতে বা তৈরি করতে টাইপ করুন...",
+    "noTagsFound": "কোন মিলে যাওয়া ট্যাগ পাওয়া যায়নি।"
+  },
+  "SubmissionsView": {
+    "notFound": "জমা পাওয়া যায়নি",
+    "detailsTitle": "জমা বিবরণ"
+  },
+  "SubmissionsList": {
+    "notFound": "টেমপ্লেট পাওয়া যায়নি",
+    "noSubmissions": "এখনও কোন জমা নেই",
+    "submittedByHeader": "জমাদানকারী",
+    "dateHeader": "তারিখ"
+  },
+  "TopicSelector": {
+    "topicLabel": "বিষয়",
+    "selectPlaceholder": "একটি বিষয় নির্বাচন করুন",
+    "errorFetchTopics": "বিষয় আনতে ব্যর্থ হয়েছে"
+  },
+  "SubmitPage": {
+    "errorFetchTemplate": "টেমপ্লেট আনতে ব্যর্থ হয়েছে",
+    "errorGeneric": "একটি ত্রুটি ঘটেছে",
+    "templateNotFound": "টেমপ্লেট পাওয়া যায়নি",
+    "requiredIndicator": "*",
+    "checkboxDefaultLabel": "হ্যাঁ",
+    "errorSubmit": "ফর্ম জমা দিতে ব্যর্থ হয়েছে"
+  },
+  "TemplateSubmissions": {
+    "loadingText": "লোড হচ্ছে...",
+    "errorGeneric": "একটি ত্রুটি ঘটেছে",
+    "errorFetchTemplate": "টেমপ্লেট আনতে ব্যর্থ হয়েছে",
+    "errorFetchSubmissions": "জমা আনতে ব্যর্থ হয়েছে",
+    "templateNotFound": "টেমপ্লেট পাওয়া যায়নি",
+    "submissionsFor": "{title} এর জন্য জমা",
+    "backToTemplate": "টেমপ্লেটে ফিরে যান",
+    "addSubmission": "জমা যোগ করুন",
+    "noSubmissions": "এখনও কোন জমা নেই",
+    "createFirstSubmission": "প্রথম জমা তৈরি করুন",
+    "totalSubmissions": "মোট জমা: {count}",
+    "submittedByHeader": "জমাদানকারী",
+    "dateHeader": "তারিখ",
+    "valueYes": "হ্যাঁ",
+    "valueNo": "না",
+    "valueNA": "প্রযোজ্য নয়"
+  },
+  "TemplateSubmit": {
+    "loadingText": "লোড হচ্ছে...",
+    "errorGeneric": "একটি ত্রুটি ঘটেছে",
+    "errorFetchTemplate": "টেমপ্লেট আনতে ব্যর্থ হয়েছে",
+    "errorSubmitForm": "ফর্ম জমা দিতে ব্যর্থ হয়েছে",
+    "templateNotFound": "টেমপ্লেট পাওয়া যায়নি",
+    "requiredIndicator": "*",
+    "checkboxDefaultLabel": "হ্যাঁ",
+    "submitButton": "জমা দিন",
+    "submittingButton": "জমা দেওয়া হচ্ছে...",
+    "notFound": "টেমপ্লেট পাওয়া যায়নি"
+  },
+  "UserSelector": {
+    "label": "অ্যাক্সেস অনুমতি দিন",
+    "labelHint": "(শুধুমাত্র যখন টেমপ্লেট সর্বজনীন নয়)",
+    "searchPlaceholder": "নাম বা ইমেল দ্বারা ব্যবহারকারী খুঁজুন...",
+    "removeUserAriaLabel": "ব্যবহারকারী {userName} অপসারণ করুন",
+    "loadingText": "লোড হচ্ছে...",
+    "loadMoreButton": "আরও ব্যবহারকারী লোড করুন",
+    "noResultsText": "কোন মিলে যাওয়া ব্যবহারকারী পাওয়া যায়নি।",
+    "errorFetchUsers": "ব্যবহারকারী আনতে ব্যর্থ হয়েছে"
+  },
+ 
+  "Common": {
+    "appDescription": "সহজেই সুন্দর ফর্ম তৈরি করুন এবং শেয়ার করুন।",
+    "loading": "লোড হচ্ছে...",
+    "error": "একটি ত্রুটি ঘটেছে",
+    "submit": "জমা দিন",
+    "cancel": "বাতিল",
+    "save": "সংরক্ষণ",
+    "edit": "সম্পাদনা",
+    "delete": "মুছুন",
+    "create": "তৈরি করুন",
+    "view": "দেখুন",
+    "search": "খুঁজুন",
+    "close": "বন্ধ করুন",
+    "yes": "হ্যাঁ",
+    "no": "না",
+    "required": "প্রয়োজনীয়",
+    "optional": "ঐচ্ছিক"
+  },
+  "openMenu": "মেনু খুলুন",
+  "toggleTheme": "থিম পরিবর্তন করুন",
+  "Theme": {
+    "toggleTheme": "থিম পরিবর্তন করুন",
+    "light": "লাইট",
+    "dark": "ডার্ক",
+    "system": "সিস্টেম"
+  },
+  "ProtectedPage": {
+    "greeting": "হ্যালো"
+  },
+  "TemplateActions": {
+    "confirmDelete": "আপনি কি নিশ্চিত যে আপনি এই টেমপ্লেটটি মুছতে চান?",
+    "errorDeleteFailed": "টেমপ্লেট মুছতে ব্যর্থ হয়েছে",
+    "openMenu": "মেনু খুলুন",
+    "editAction": "সম্পাদনা",
+    "deleteAction": "মুছুন",
+    "deletingState": "মুছে ফেলা হচ্ছে..."
+  },
+  "HomePage": {
+    "createNewFormTitle": "নতুন ফর্ম তৈরি করুন",
+    "popularFormsTitle": "জনপ্রিয় ফর্ম"
+  }
+}

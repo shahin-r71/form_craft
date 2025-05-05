@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
@@ -10,12 +10,48 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigge
 import { ThemeToggle } from '@/components/theme/ThemeToggle';
 import { LogoutButton } from '@/components/auth/logout-button';
 import { Menu, Search, X } from 'lucide-react';
+import { useTranslations } from 'next-intl';
+import { createClient } from '@/utils/supabase/client'; 
+import type { User } from '@supabase/supabase-js'; 
 
 export default function NavBar() {
+  const t = useTranslations('Navbar');
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const router = useRouter();
+  const [currentLocale, setCurrentLocale] = useState('en');
+  const [user, setUser] = useState<User | null>(null); // State for user session
+  const supabase = createClient(); // Create Supabase client instance
 
+  // Fetch user session and locale on mount, and listen for auth changes
+  useEffect(() => {
+    const getCookie = (name: string) => {
+      const value = `; ${document.cookie}`;
+      const parts = value.split(`; ${name}=`);
+      if (parts.length === 2) return parts.pop()?.split(';').shift() || 'en';
+      return 'en';
+    };
+    setCurrentLocale(getCookie('NEXT_LOCALE'));
+
+    // Fetch initial user state
+    const fetchUser = async () => {
+      const { data, error } = await supabase.auth.getUser();
+      if (!error) {
+        setUser(data?.user ?? null);
+      }
+    };
+    fetchUser();
+
+    // Listen for authentication state changes
+    const { data: authListener } = supabase.auth.onAuthStateChange((event, session) => {
+      setUser(session?.user ?? null);
+    });
+
+    // Cleanup listener on component unmount
+    return () => {
+      authListener?.subscription.unsubscribe();
+    };
+  }, [supabase]); 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
     // Implement search functionality
@@ -28,8 +64,8 @@ export default function NavBar() {
         {/* Logo */}
         <div className="flex-shrink-0">
           <Link href="/" className="flex items-center space-x-2">
-            <span className="font-bold text-2xl bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
-              Form<span className="text-primary">Craft</span>
+            <span className="font-bold text-2xl bg-primary bg-clip-text text-transparent">
+              Form<span className="text-gray-500 dark:text-gray-300">Craft</span>
             </span>
           </Link>
         </div>
@@ -41,7 +77,7 @@ export default function NavBar() {
               <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
               <Input
                 type="search"
-                placeholder="Search templates..."
+                placeholder={t('searchPlaceholder')}
                 className="w-full pl-8"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
@@ -53,31 +89,40 @@ export default function NavBar() {
         {/* Desktop Navigation */}
         <div className="hidden md:flex md:items-center md:space-x-4 flex-shrink-0">
           <ThemeToggle />
-          <select 
+          <select
             className="bg-background border rounded-md px-2 py-1"
-            onChange={(e) => console.log('Language changed:', e.target.value)}
+            value={currentLocale}
+            onChange={(e) => {
+              const locale = e.target.value;
+              document.cookie = `NEXT_LOCALE=${locale};path=/;max-age=31536000`;
+              window.location.reload();
+            }}
           >
-            <option value="en">EN</option>
-            <option value="bn">BN</option>
+            <option value="en">{t('langEnglish')}</option>
+            <option value="bn">{t('langBengali')}</option>
           </select>
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="ghost" className="relative h-8 w-8 rounded-full">
-                <Avatar className="h-8 w-8">
-                  <AvatarImage src="/avatars/01.png" alt="@user" />
-                  <AvatarFallback>U</AvatarFallback>
-                </Avatar>
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className='flex flex-col gap-1 items-center justify-center'>
-              <DropdownMenuItem onClick={() => router.push('/dashboard')}>
-                Dashboard
-              </DropdownMenuItem>
-              <DropdownMenuItem>
-                <LogoutButton />
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
+          {user ? (
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="ghost" className="relative h-8 w-8 rounded-full">
+                  <Avatar className="h-8 w-8">
+                    <AvatarImage src={user.user_metadata?.avatar_url || ''} alt={user.email || '@user'} />
+                    <AvatarFallback>{user.email?.[0]?.toUpperCase() || 'U'}</AvatarFallback>
+                  </Avatar>
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className='flex flex-col gap-1 items-center justify-center'>
+                <DropdownMenuItem onClick={() => router.push('/dashboard')}>
+                  {t('dashboardLink')}
+                </DropdownMenuItem>
+                <DropdownMenuItem>
+                  <LogoutButton />
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          ) : (
+            <Button onClick={() => router.push('/auth/login')}>{t('loginButton')}</Button>
+          )}
         </div>
 
         {/* Mobile Menu Button */}
@@ -100,7 +145,7 @@ export default function NavBar() {
                 <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
                 <Input
                   type="search"
-                  placeholder="Search templates..."
+                  placeholder={t('searchPlaceholder')}
                   className="w-full pl-8"
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
@@ -111,20 +156,33 @@ export default function NavBar() {
               <ThemeToggle />
               <select
                 className="bg-background border rounded-md px-2 py-1"
-                onChange={(e) => console.log('Language changed:', e.target.value)}
+                value={currentLocale}
+                onChange={(e) => {
+                  const locale = e.target.value;
+                  document.cookie = `NEXT_LOCALE=${locale};path=/;max-age=31536000`;
+                  window.location.reload();
+                }}
               >
-                <option value="en">EN</option>
-                <option value="es">ES</option>
-                <option value="fr">FR</option>
+                <option value="en">{t('langEnglish')}</option>
+                <option value="bn">{t('langBengali')}</option>
+                {/* Add other languages as needed */}
               </select>
-              <Button
-                variant="ghost"
-                className="flex items-center justify-start"
-                onClick={() => router.push('/dashboard')}
-              >
-                Dashboard
-              </Button>
-              <LogoutButton />
+              {user ? (
+                <>
+                  <Button
+                    variant="ghost"
+                    className="flex items-center justify-start"
+                    onClick={() => router.push('/dashboard')}
+                  >
+                    {t('dashboardLink')}
+                  </Button>
+                  <LogoutButton />
+                </>
+              ) : (
+                <Button onClick={() => router.push('/auth/login')} className="w-full justify-center">
+                  {t('loginButton')}
+                </Button>
+              )}
             </div>
           </div>
         )}

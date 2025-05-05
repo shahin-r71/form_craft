@@ -17,10 +17,11 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { createTemplateSchema, type CreateTemplateInput } from '@/lib/validations/template';
 import ErrorMsg from '@/components/chore/ErrorMsg';
 import CoverImage from '@/components/templates/cover-image';
+import { useTranslations } from 'next-intl';
 
 export function TemplateForm() {
+  const t = useTranslations('TemplateEditForm'); // Using TemplateEditForm keys as they are similar
   const router = useRouter();
-
 
   const form = useForm<CreateTemplateInput>({
     resolver: zodResolver(createTemplateSchema) as Resolver<
@@ -66,7 +67,7 @@ export function TemplateForm() {
       if (!response.ok) {
         const error = await response.json();
         console.log(error)
-        throw new Error(error.message || 'Failed to create template');
+        throw new Error(error.message || t('errorFailedToCreate')); // Use translation
       }
 
       const template = await response.json();
@@ -75,7 +76,8 @@ export function TemplateForm() {
       router.refresh();
     } catch (error) {
       console.error('Error creating template:', error);
-      alert(error instanceof Error ? error.message : 'Failed to create template');
+      // Use translated error message
+      alert(error instanceof Error ? error.message : t('errorFailedToCreate')); // Use translation
     }
   };
 
@@ -83,7 +85,7 @@ export function TemplateForm() {
     <Card className="p-6">
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
         <div className="space-y-2">
-          <Label>Cover Image(Optional)</Label>
+          <Label>{t('coverImageLabel')}</Label>
           <CoverImage
             value={form.watch("imageUrl")}
             onChange={(url: string | null) =>
@@ -99,7 +101,7 @@ export function TemplateForm() {
         </div>
 
         <div className="space-y-2">
-          <Label htmlFor="title">Title</Label>
+          <Label htmlFor="title">{t('titleLabel')}</Label>
           <Input id="title" {...form.register("title")} />
           {form.formState.errors.title && (
             <ErrorMsg message={form.formState.errors.title.message} />
@@ -107,7 +109,7 @@ export function TemplateForm() {
         </div>
 
         <div className="space-y-2">
-          <Label htmlFor="description">Description</Label>
+          <Label htmlFor="description">{t('descriptionLabel')}</Label>
           <Input id="description" {...form.register("description")} />
           {form.formState.errors.description && (
             <ErrorMsg message={form.formState.errors.description.message} />
@@ -139,7 +141,7 @@ export function TemplateForm() {
               {...form.register("isPublic")}
               className="h-4 w-4"
             />
-            <span>Make this template public</span>
+            <span>{t('makePublicLabel')}</span>
           </Label>
         </div>
 
@@ -154,32 +156,32 @@ export function TemplateForm() {
         )}
 
         <div className="space-y-4">
-          <h3 className="text-lg font-medium">Form Fields</h3>
+          <h3 className="text-lg font-medium">{t('formFieldsTitle')}</h3>
 
           {fields.map((field, index) => {
             const typeError = form.formState.errors.templateFields?.[index]?.type;
             return (
               <Card key={field.id} className="p-4 space-y-4">
                 <div className="flex justify-between">
-                  <h4 className="font-medium">Field {index + 1}</h4>
+                  <h4 className="font-medium">{t('fieldLabel', { index: index + 1 })}</h4>
                   <Button
                     type="button"
                     variant="destructive"
                     onClick={() => remove(index)}
                   >
-                    Remove
+                    {t('removeButton')}
                   </Button>
                 </div>
 
                 <div className="space-y-2">
-                  <Label>Type</Label>
+                  <Label>{t('typeLabel')}</Label>
                   <select
                     {...form.register(`templateFields.${index}.type` as const)}
                     className="w-full p-2 border rounded dark:bg-accent dark:text-white"
                   >
                     {Object.values(FieldType).map((type) => (
                       <option key={type} value={type}>
-                        {type}
+                        {type} {/* Assuming FieldType enum values are user-friendly */}
                       </option>
                     ))}
                   </select>
@@ -191,7 +193,7 @@ export function TemplateForm() {
                 </div>
 
                 <div className="space-y-2">
-                  <Label>Title</Label>
+                  <Label>{t('titleLabel')}</Label>
                   <Input {...form.register(`templateFields.${index}.title`)} />
                   {form.formState.errors.templateFields?.[index]?.title && (
                     <ErrorMsg
@@ -203,7 +205,7 @@ export function TemplateForm() {
                 </div>
 
                 <div className="space-y-2">
-                  <Label>Description</Label>
+                  <Label>{t('descriptionLabel')}</Label>
                   <Input {...form.register(`templateFields.${index}.description`)} />
                   {form.formState.errors.templateFields?.[index]?.description && (
                     <ErrorMsg
@@ -221,47 +223,32 @@ export function TemplateForm() {
                       {...form.register(`templateFields.${index}.required`)}
                       className="h-4 w-4"
                     />
-                    <span>Required field</span>
+                    <span>{t('requiredLabel')}</span>
                   </Label>
                 </div>
 
                 <div className="space-y-2">
-                  {/* todo: think about this feature later */}
-                  {/* <Label className="flex items-center space-x-2">
+                  <Label className="flex items-center space-x-2">
                     <input
                       type="checkbox"
                       {...form.register(`templateFields.${index}.showInResults`)}
                       className="h-4 w-4"
                     />
-                    <span>Show in results</span>
-                  </Label> */}
+                    <span>{t('showInResultsLabel')}</span>
+                  </Label>
                 </div>
               </Card>
             );
           })}
-          {form.formState.errors.templateFields?.message && (
-            <ErrorMsg message={form.formState.errors.templateFields.message} />
-          )}
-        </div>
 
-        <div className="flex flex-col gap-4 items-center mt-8">
-          <Button
-            type="button"
-            onClick={addField}
-            className="w-full max-w-xs"
-            variant="outline"
-          >
-            Add New Field
-          </Button>
-
-          <Button
-            type="submit"
-            disabled={form.formState.isSubmitting}
-            className="w-full max-w-xs"
-          >
-            {form.formState.isSubmitting ? "Creating..." : "Create Template"}
+          <Button type="button" onClick={addField}>
+            {t('addFieldButton')}
           </Button>
         </div>
+
+        <Button type="submit" disabled={form.formState.isSubmitting}>
+          {form.formState.isSubmitting ? t('creatingTemplateButton') : t('createTemplateButton')}
+        </Button>
       </form>
     </Card>
   );

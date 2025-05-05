@@ -8,6 +8,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Template } from '@/types/template';
+import { useTranslations, useFormatter } from 'next-intl';
 
 
 interface User {
@@ -29,6 +30,8 @@ interface Submission {
 }
 
 export default function DashboardPage() {
+  const t = useTranslations('Dashboard');
+  const format = useFormatter();
   const router = useRouter();
   const [user, setUser] = useState<User | null>(null);
   const [createdTemplates, setCreatedTemplates] = useState<Template[]>([]);
@@ -44,7 +47,7 @@ export default function DashboardPage() {
         const { data: { user: authUser }, error: authError } = await supabase.auth.getUser();
         
         if (authError || !authUser) {
-          throw new Error('Not authenticated');
+          throw new Error(t('errorNotAuthenticated')); // Use translation
         }
 
         // Set basic user info
@@ -60,7 +63,7 @@ export default function DashboardPage() {
         // Fetch templates created by user
         const templatesResponse = await fetch('/api/templates?ownerId=' + authUser.id);
         if (!templatesResponse.ok) {
-          throw new Error('Failed to fetch created templates');
+          throw new Error(t('errorFetchCreatedTemplates')); // Use translation
         }
         const templatesData = await templatesResponse.json();
         setCreatedTemplates(templatesData);
@@ -68,14 +71,23 @@ export default function DashboardPage() {
         // Fetch submissions made by user
         const submissionsResponse = await fetch('/api/submissions/user');
         if (!submissionsResponse.ok) {
-          throw new Error('Failed to fetch filled templates');
+          throw new Error(t('errorFetchFilledTemplates')); // Use translation
         }
         const submissionsData = await submissionsResponse.json();
         setFilledTemplates(submissionsData);
 
       } catch (err) {
         console.error('Error fetching user data:', err);
-        setError(err instanceof Error ? err.message : 'An error occurred');
+        // Use specific translated errors if possible, otherwise generic
+        let errorMessage = t('errorGeneric');
+        if (err instanceof Error) {
+          if (err.message === 'Not authenticated') errorMessage = t('errorNotAuthenticated');
+          else if (err.message === 'Failed to fetch created templates') errorMessage = t('errorFetchCreatedTemplates');
+          else if (err.message === 'Failed to fetch filled templates') errorMessage = t('errorFetchFilledTemplates');
+          // Keep original message if it's none of the above specific ones, or use generic
+          // else errorMessage = err.message; // Option to show original non-translated error
+        }
+        setError(errorMessage);
       } finally {
         setLoading(false);
       }
@@ -130,7 +142,8 @@ export default function DashboardPage() {
                 </AvatarFallback>
               </Avatar>
               <div className="space-y-1 text-center md:text-left">
-                <h2 className="text-2xl font-bold">{user.name || 'User'}</h2>
+                {/* Assuming user name translation is not needed, or handled elsewhere */}
+                <h2 className="text-2xl font-bold">{user.name || t('userNameFallback')}</h2> {/* Use translation */}
                 <p className="text-muted-foreground">{user.email}</p>
               </div>
             </div>
@@ -140,27 +153,27 @@ export default function DashboardPage() {
         {/* Templates Tabs */}
         <Tabs defaultValue="created" className="w-full">
           <TabsList className="grid w-full grid-cols-2">
-            <TabsTrigger value="created">Templates Created</TabsTrigger>
-            <TabsTrigger value="filled">Templates Filled</TabsTrigger>
+            <TabsTrigger value="created">{t('templatesCreatedTab')}</TabsTrigger>
+            <TabsTrigger value="filled">{t('templatesFilledTab')}</TabsTrigger>
           </TabsList>
-          
+
           {/* Created Templates Tab */}
           <TabsContent value="created" className="space-y-4 pt-4">
             <div className="flex justify-between items-center">
-              <h3 className="text-xl font-semibold">Your Templates</h3>
+              <h3 className="text-xl font-semibold">{t('yourTemplatesTitle')}</h3>
               <Button onClick={() => router.push('/templates/create')}>
-                Create New Template
+                {t('createNewTemplateButton')}
               </Button>
             </div>
-            
+
             {createdTemplates.length === 0 ? (
               <Card className="p-6 text-center">
-                <p className="text-gray-500 dark:text-gray-400">You haven't created any templates yet</p>
-                <Button 
-                  className="mt-4" 
+                <p className="text-gray-500 dark:text-gray-400">{t('noTemplatesCreated')}</p>
+                <Button
+                  className="mt-4"
                   onClick={() => router.push('/templates/create')}
                 >
-                  Create Your First Template
+                  {t('createFirstTemplateButton')}
                 </Button>
               </Card>
             ) : (
@@ -185,15 +198,26 @@ export default function DashboardPage() {
                           {template.description}
                         </p>
                       )}
-                      <div className="flex justify-between items-center pt-2">
-                        <div className="text-sm text-muted-foreground">
-                          {template._count?.submissions || 0} submissions
-                        </div>
-                        <Button 
-                          variant="outline" 
+                      <div className="flex gap-2 mt-4">
+                        <Button
+                          size="sm"
+                          variant="outline"
                           onClick={() => router.push(`/templates/${template.id}`)}
                         >
-                          View
+                          {t('viewButton')}
+                        </Button>
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          onClick={() => router.push(`/templates/${template.id}/edit`)}
+                        >
+                          {t('editButton')}
+                        </Button>
+                        <Button
+                          size="sm"
+                          onClick={() => router.push(`/templates/${template.id}/submissions`)}
+                        >
+                          {t('submissionsButton')}
                         </Button>
                       </div>
                     </CardContent>
@@ -202,38 +226,40 @@ export default function DashboardPage() {
               </div>
             )}
           </TabsContent>
-          
+
           {/* Filled Templates Tab */}
           <TabsContent value="filled" className="space-y-4 pt-4">
-            <h3 className="text-xl font-semibold">Templates You've Filled</h3>
-            
+            <h3 className="text-xl font-semibold">{t('templatesFilledTitle')}</h3>
             {filledTemplates.length === 0 ? (
               <Card className="p-6 text-center">
-                <p className="text-gray-500 dark:text-gray-400">You haven't filled any templates yet</p>
+                <p className="text-gray-500 dark:text-gray-400">{t('noTemplatesFilled')}</p>
               </Card>
             ) : (
-              <div className="space-y-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                 {filledTemplates.map(submission => (
-                  <Card key={submission.id} className="overflow-hidden">
+                  <Card key={submission.id}>
                     <CardHeader>
-                      <CardTitle>{submission.template.title}</CardTitle>
+                      <CardTitle className="line-clamp-1">{submission.template.title}</CardTitle>
                     </CardHeader>
                     <CardContent className="space-y-2">
                       {submission.template.description && (
-                        <p className="text-sm text-muted-foreground">
+                        <p className="text-sm text-muted-foreground line-clamp-2">
                           {submission.template.description}
                         </p>
                       )}
-                      <div className="flex justify-between items-center pt-2">
-                        <div className="text-sm text-muted-foreground">
-                          Submitted on {new Date(submission.createdAt).toLocaleDateString()}
-                        </div>
-                        <Button 
-                          variant="outline" 
-                          onClick={() => router.push(`/templates/${submission.templateId}/submit/view?submissionId=${submission.id}`)}
+                      <p className="text-xs text-muted-foreground">
+                        {t('submittedOnLabel')} {format.dateTime(new Date(submission.createdAt), 'short')}
+                      </p>
+                      <div className="flex gap-2 mt-4">
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          onClick={() => router.push(`/templates/${submission.templateId}`)}
                         >
-                          View Submission
+                          {t('viewTemplateButton')}
                         </Button>
+                        {/* Optionally add a button to view the specific submission details */}
+                        {/* <Button size="sm" onClick={() => router.push(`/submissions/${submission.id}`)}>View Submission</Button> */}
                       </div>
                     </CardContent>
                   </Card>

@@ -35,7 +35,7 @@ const FormCard = ({ id, title, description, imageUrl, submissionCount }: FormPro
   // const submissionCount: number = _count.submissions;
   return (
     <Link href={`/templates/${id}`}>
-      <Card className="aspect-[4/3] overflow-hidden hover:border-primary/50 transition-colors py-0 relative">
+      <Card className="aspect-[4/3] overflow-hidden hover:border-primary/50 transition-colors py-0 relative dark:bg-card">
         <div className="absolute top-2 right-2 z-10">
           <Badge variant="secondary" className="font-medium">
             {submissionCount} {submissionCount === 1 ? 'submission' : 'submissions'}
@@ -92,22 +92,17 @@ export default function PopularForms() {
   }
 
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4 px-2">
+    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4 px-2 w-full">
       {isLoading ? (
-          <>
-          {
           [...Array(10)].map((_, i) => (
-            <div key={i} className="flex flex-col w-[200px] space-y-3 bg-white rounded-md dark:bg-background p-1">
+            <div key={i} className="flex flex-col w-[200px] space-y-3 bg-white rounded-md dark:bg-card p-1">
               <Skeleton className="h-[125px] w-[190px] rounded-xl" />
               <div className="space-y-2">
                 <Skeleton className="h-4 w-[190px]" />
                 <Skeleton className="h-4 w-[190px]" />
               </div>
             </div>
-      
           ))
-         }
-        </>
       ) : (
         forms.map((form) => (
           <FormCard

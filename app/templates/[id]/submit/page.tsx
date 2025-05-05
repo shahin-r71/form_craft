@@ -14,10 +14,12 @@ import { Card } from '@/components/ui/card';
 import type { Template } from '@/types/template';
 import { FieldType } from '@prisma/client';
 import { submissionValidationSchema } from '@/lib/validations/submission';
+import { useTranslations } from 'next-intl';
 
 export default function SubmitTemplatePage() {
   const { id } = useParams();
   const router = useRouter();
+  const t = useTranslations('TemplateSubmit');
   const [template, setTemplate] = useState<Template | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -29,12 +31,12 @@ export default function SubmitTemplatePage() {
       try {
         const response = await fetch(`/api/templates/${id}`);
         if (!response.ok) {
-          throw new Error('Failed to fetch template');
+          throw new Error(t('errorFetchTemplate'));
         }
         const data = await response.json();
         setTemplate(data);
       } catch (err) {
-        setError(err instanceof Error ? err.message : 'An error occurred');
+        setError(err instanceof Error ? err.message : t('errorGeneric'));
       } finally {
         setLoading(false);
       }
@@ -103,13 +105,13 @@ export default function SubmitTemplatePage() {
       
       if (!response.ok) {
         const errorData = await response.json();
-        throw new Error(errorData.error || 'Failed to submit form');
+        throw new Error(errorData.error || t('errorSubmitForm'));
       }
       
       // Redirect to a success page or template details
       router.push(`/templates/${template.id}?submitted=true`);
     } catch (err) {
-      setSubmitError(err instanceof Error ? err.message : 'An error occurred');
+      setSubmitError(err instanceof Error ? err.message : t('errorGeneric'));
     } finally {
       setSubmitting(false);
     }
@@ -120,6 +122,7 @@ export default function SubmitTemplatePage() {
     return (
       <div className="flex items-center justify-center min-h-screen">
         <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-blue-500"></div>
+        <span className="sr-only">{t('loadingText')}</span>
       </div>
     );
   }
@@ -137,7 +140,7 @@ export default function SubmitTemplatePage() {
   if (!template) {
     return (
       <div className="flex items-center justify-center min-h-screen">
-        <div>Template not found</div>
+        <div>{t('templateNotFound')}</div>
       </div>
     );
   }
@@ -157,7 +160,7 @@ export default function SubmitTemplatePage() {
               <div key={field.id} className="space-y-2">
                 <Label htmlFor={field.id} className="font-medium">
                   {field.title}
-                  {field.required && <span className="text-red-500 ml-1">*</span>}
+                  {field.required && <span className="text-red-500 ml-1">{t('requiredIndicator')}</span>}
                 </Label>
                 
                 {field.description && (
@@ -197,7 +200,7 @@ export default function SubmitTemplatePage() {
                       {...form.register(field.id ||"")}
                     />
                     <Label htmlFor={field.id} className="font-normal">
-                      {field.description || 'Yes'}
+                      {field.description || t('checkboxDefaultLabel')}
                     </Label>
                   </div>
                 )}
@@ -217,7 +220,7 @@ export default function SubmitTemplatePage() {
             )}
             
             <Button type="submit" className="w-full" disabled={submitting}>
-              {submitting ? 'Submitting...' : 'Submit'}
+              {submitting ? t('submittingButton') : t('submitButton')}
             </Button>
           </form>
         </Card>

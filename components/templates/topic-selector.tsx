@@ -3,6 +3,8 @@
 import { useEffect, useState } from 'react';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { useTranslations } from 'next-intl';
+import { toast } from 'react-toastify';
 
 interface Topic {
   id: string;
@@ -15,6 +17,7 @@ interface TopicSelectorProps {
 }
 
 export function TopicSelector({ value, onChange }: TopicSelectorProps) {
+  const t = useTranslations('TopicSelector');
   const [topics, setTopics] = useState<Topic[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
@@ -22,11 +25,12 @@ export function TopicSelector({ value, onChange }: TopicSelectorProps) {
     const fetchTopics = async () => {
       try {
         const response = await fetch('/api/topics');
-        if (!response.ok) throw new Error('Failed to fetch topics');
+        if (!response.ok) throw new Error(t('errorFetchTopics'));
         const data = await response.json();
         setTopics(data);
       } catch (error) {
-        console.error('Error fetching topics:', error);
+        console.error('Error fetching topics:', error); // Keep console log for debugging
+        toast.error(t('errorFetchTopics'));
       } finally {
         setIsLoading(false);
       }
@@ -37,10 +41,10 @@ export function TopicSelector({ value, onChange }: TopicSelectorProps) {
 
   return (
     <div className="space-y-2">
-      <Label htmlFor="topic">Topic</Label>
+      <Label htmlFor="topic">{t('topicLabel')}</Label>
       <Select value={value} onValueChange={onChange} disabled={isLoading}>
         <SelectTrigger id="topic">
-          <SelectValue placeholder="Select a topic" />
+          <SelectValue placeholder={t('selectPlaceholder')} />
         </SelectTrigger>
         <SelectContent>
           {topics.map((topic) => (

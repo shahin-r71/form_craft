@@ -1,0 +1,285 @@
+{
+  "Navbar": {
+    "searchPlaceholder": "Search templates...",
+    "logoPart1": "Form",
+    "logoPart2": "Craft",
+    "dashboardLink": "Dashboard",
+    "langEnglish": "EN",
+    "langBengali": "BN",
+    "loginButton": "Login"
+  },
+  "TemplateGallery": {
+    "startBlank": "Start a blank form",
+    "goToFormPage": "go to the form page for more info",
+    "errorFetchTemplates": "Failed to fetch templates"
+  },
+  "PopularForms": {
+    "goToFormPage": "go to the form page for more info",
+    "errorFetchForms": "Failed to fetch forms"
+  },
+  "Footer": {
+    "product": "Product",
+    "company": "Company",
+    "legal": "Legal",
+    "formCraft": "FormCraft",
+    "allRightsReserved": "All rights reserved."
+  },
+  "Auth": {
+    "loginTitle": "Login",
+    "loginDescription": "Enter your email below to login to your account",
+    "emailLabel": "Email",
+    "passwordLabel": "Password",
+    "forgotPasswordLink": "Forgot your password?",
+    "loggingInButton": "Logging in...",
+    "emailPlaceholder": "m@example.com",
+    "signUpTitle": "Sign up",
+    "signUpDescription": "Create a new account",
+    "signUpButton": "Sign up",
+    "creatingAccountButton": "Creating an account...",
+    "alreadyHaveAccountPrompt": "Already have an account?",
+    "passwordsDoNotMatchError": "Passwords do not match",
+    "repeatPasswordLabel": "Repeat Password",
+    "logoutButton": "Logout",
+    "signUpSuccessTitle": "Thank you for signing up!",
+    "signUpSuccessDescription": "Check your email to confirm",
+    "resetPasswordTitle": "Reset Your Password",
+    "newPasswordLabel": "New password",
+    "newPasswordPlaceholder": "New password",
+    "checkEmailTitle": "Check Your Email",
+    "checkEmailDescription": "Password reset instructions sent",
+    "checkEmailInfo": "If you registered using your email and password, you will receive a password reset email.",
+    "resetPasswordDescription": "Type in your email and we'll send you a link to reset your password",
+    "sendingButton": "Sending...",
+    "sendResetEmailButton": "Send reset email",
+    "updatePasswordDescription": "Please enter your new password below.",
+    "savingButton": "Saving...",
+    "saveNewPasswordButton": "Save new password",
+    "authErrorTitle": "Sorry, something went wrong.",
+    "authErrorDescription": "An unspecified error occurred.",
+    "authErrorCodeLabel": "Code:",
+    "noAccountPrompt": "Don't have an account?"
+  },
+  "TemplateDetail": {
+    "loadingText": "Loading...",
+    "errorGeneric": "An error occurred",
+    "templateNotFound": "Template not found",
+    "createdBy": "Created by:",
+    "anonymousUser": "Anonymous",
+    "topicLabel": "Topic:",
+    "templateFieldsTitle": "Template Fields",
+    "fieldTypeLabel": "Type:",
+    "requiredLabel": "Required",
+    "optionalLabel": "Optional",
+    "shownInResultsLabel": "Shown in results",
+    "hiddenInResultsLabel": "Hidden in results",
+    "submissionsLabel": "submissions",
+    "likesLabel": "likes",
+    "commentsLabel": "comments",
+    "fillOutFormButton": "Fill Out Form",
+    "viewSubmissionsButton": "View Submissions",
+    "likeButton": "Like",
+    "likesButton": "Likes",
+    "commentsTitle": "Comments ({count})",
+    "addCommentPlaceholder": "Add a comment...",
+    "postCommentButton": "Post Comment",
+    "postingCommentButton": "Posting...",
+    "signInToCommentPrompt": "Please sign in to comment",
+    "loadMoreCommentsButton": "Load More Comments",
+    "formSubmittedSuccess": "Form submitted successfully! Thank you for your submission.",
+    "commentAddedSuccess": "Comment added successfully.",
+    "errorFetchingTemplate": "Error fetching template details.",
+    "errorSubmittingForm": "Error submitting form.",
+    "errorAddingComment": "Error adding comment.",
+    "errorLikingTemplate": "Error liking template.",
+    "errorGenericLike": "Take some breath before trying again..."
+  },
+  "Dashboard": {
+    "templatesCreatedTab": "Created Templates",
+    "templatesFilledTab": "Filled Templates",
+    "yourTemplatesTitle": "Your Templates",
+    "noTemplatesCreated": "You haven't created any templates yet.",
+    "templatesFilledTitle": "Templates You've Filled",
+    "noTemplatesFilled": "You haven't filled out any templates yet.",
+    "viewSubmissionButton": "View Submission",
+    "createNewTemplateButton": "Create New Template",
+    "createFirstTemplateButton": "Create your first template",
+    "viewTemplateButton": "View Template",
+    "submissionsCount": "{count, plural, =0 {No submissions} one {# submission} other {# submissions}}",
+    "errorNotAuthenticated": "Not authenticated",
+    "errorFetchCreatedTemplates": "Failed to fetch created templates",
+    "errorFetchFilledTemplates": "Failed to fetch filled templates",
+    "errorGeneric": "An error occurred",
+    "userNameFallback": "User",
+    "viewButton": "View",
+    "editButton": "Edit",
+    "submissionsButton": "Submissions",
+    "submittedOnLabel": "Submitted on:"
+  },
+  "TemplateCreate": {
+    "title": "Create New Form Template"
+  },
+  "TemplateEdit": {
+    "title": "Edit Form Template",
+    "notFound": "Template not found"
+  },
+  "TemplateView": {
+    "notFound": "Template not found",
+    "fieldsTitle": "Template Fields",
+    "addCommentPlaceholder": "Add a comment...",
+    "signInToComment": "Please sign in to comment",
+    "postCommentButton": "Post Comment",
+    "postingCommentButton": "Posting..."
+  },
+  "TemplateForm": {
+    "titleLabel": "Title",
+    "descriptionLabel": "Description",
+    "makePublicLabel": "Make this template public",
+    "formFieldsTitle": "Form Fields",
+    "typeLabel": "Type",
+    "requiredLabel": "Required field",
+    "showInResultsLabel": "Show in results"
+  },
+  "TemplateEditForm": {
+    "titleLabel": "Title",
+    "descriptionLabel": "Description",
+    "makePublicLabel": "Make this template public",
+    "formFieldsTitle": "Form Fields",
+    "typeLabel": "Type",
+    "requiredLabel": "Required",
+    "showInResultsLabel": "Show in Results",
+    "coverImageLabel": "Cover Image(Optional)",
+    "removeButton": "Remove",
+    "fieldLabel": "Field {index}",
+    "addFieldButton": "Add Field",
+    "createTemplateButton": "Create Template",
+    "creatingTemplateButton": "Creating...",
+    "updateTemplateButton": "Update Template",
+    "errorFailedToCreate": "Failed to create template",
+    "errorFailedToUpdate": "Failed to update template",
+    "templateUpdatedSuccess": "Template updated successfully",
+    "atLeastOneFieldRequired": "At least one field is required"
+  },
+  "CoverImage": {
+    "uploadSuccess": "Successfully uploaded!",
+    "uploadPrompt": "Click to upload cover image",
+    "sizeRecommendation": "Recommended size: 1200 x 400px"
+  },
+  "TagSelector": {
+    "label": "Tags",
+    "placeholder": "Type to search or create tags...",
+    "removeTagAriaLabel": "Remove tag {tagName}",
+    "createButtonText": "Create tag \"{tagName}\"",
+    "creatingButtonText": "Creating...",
+    "noResultsText": "No matching tags found.",
+    "errorFetchTags": "Failed to fetch tags",
+    "errorCreateTag": "Failed to create tag: {errorStatus}",
+    "tagsLabel": "Tags",
+    "searchPlaceholder": "Type to search or create tags...",
+    "noTagsFound": "No matching tags found."
+  },
+  "SubmissionsView": {
+    "notFound": "Submission not found",
+    "detailsTitle": "Submission Details"
+  },
+  "SubmissionsList": {
+    "notFound": "Template not found",
+    "noSubmissions": "No submissions yet",
+    "submittedByHeader": "Submitted By",
+    "dateHeader": "Date"
+  },
+  "TopicSelector": {
+    "topicLabel": "Topic",
+    "selectPlaceholder": "Select a topic",
+    "errorFetchTopics": "Failed to fetch topics"
+  },
+  "SubmitPage": {
+    "errorFetchTemplate": "Failed to fetch template",
+    "errorGeneric": "An error occurred",
+    "templateNotFound": "Template not found",
+    "requiredIndicator": "*",
+    "checkboxDefaultLabel": "Yes",
+    "errorSubmit": "Failed to submit form"
+  },
+  "TemplateSubmissions": {
+    "loadingText": "Loading...",
+    "errorGeneric": "An error occurred",
+    "errorFetchTemplate": "Failed to fetch template",
+    "errorFetchSubmissions": "Failed to fetch submissions",
+    "templateNotFound": "Template not found",
+    "submissionsFor": "Submissions for {title}",
+    "backToTemplate": "Back to Template",
+    "addSubmission": "Add Submission",
+    "noSubmissions": "No submissions yet",
+    "createFirstSubmission": "Create First Submission",
+    "totalSubmissions": "Total submissions: {count}",
+    "submittedByHeader": "Submitted By",
+    "dateHeader": "Date",
+    "valueYes": "Yes",
+    "valueNo": "No",
+    "valueNA": "N/A"
+  },
+  "TemplateSubmit": {
+    "loadingText": "Loading...",
+    "errorGeneric": "An error occurred",
+    "errorFetchTemplate": "Failed to fetch template",
+    "errorSubmitForm": "Failed to submit form",
+    "templateNotFound": "Template not found",
+    "requiredIndicator": "*",
+    "checkboxDefaultLabel": "Yes",
+    "submitButton": "Submit",
+    "submittingButton": "Submitting...",
+    "notFound": "Template not found"
+  },
+  "UserSelector": {
+    "label": "Allow Access",
+    "labelHint": "(Only applies when template is not public)",
+    "searchPlaceholder": "Search users by name or email...",
+    "removeUserAriaLabel": "Remove user {userName}",
+    "loadingText": "Loading...",
+    "loadMoreButton": "Load more users",
+    "noResultsText": "No matching users found.",
+    "errorFetchUsers": "Failed to fetch users"
+  },
+ 
+  "Common": {
+    "appDescription": "Create and share beautiful forms easily.",
+    "loading": "Loading...",
+    "error": "An error occurred",
+    "submit": "Submit",
+    "cancel": "Cancel",
+    "save": "Save",
+    "edit": "Edit",
+    "delete": "Delete",
+    "create": "Create",
+    "view": "View",
+    "search": "Search",
+    "close": "Close",
+    "yes": "Yes",
+    "no": "No",
+    "required": "Required",
+    "optional": "Optional"
+  },
+  "openMenu": "Open menu",
+  "toggleTheme": "Toggle theme",
+  "Theme": {
+    "toggleTheme": "Toggle theme",
+    "light": "Light",
+    "dark": "Dark",
+    "system": "System"
+  },
+  "ProtectedPage": {
+    "greeting": "Hello"
+  },
+  "TemplateActions": {
+    "confirmDelete": "Are you sure you want to delete this template?",
+    "errorDeleteFailed": "Failed to delete template",
+    "openMenu": "Open menu",
+    "editAction": "Edit",
+    "deleteAction": "Delete",
+    "deletingState": "Deleting..."
+  },
+  "HomePage": {
+    "createNewFormTitle": "Create new form",
+    "popularFormsTitle": "Popular Forms"
+  }
+}

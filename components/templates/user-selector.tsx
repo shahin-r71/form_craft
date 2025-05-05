@@ -5,6 +5,8 @@ import { Label } from '@/components/ui/label';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import { X, Loader2 } from 'lucide-react';
+import { useTranslations } from 'next-intl';
+import { toast } from 'react-toastify';
 
 interface User {
   id: string;
@@ -18,6 +20,7 @@ interface UserSelectorProps {
 }
 
 export function UserSelector({ selectedUsers, onUsersChange }: UserSelectorProps) {
+  const t = useTranslations('UserSelector');
   const [users, setUsers] = useState<User[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [inputValue, setInputValue] = useState('');
@@ -32,14 +35,15 @@ export function UserSelector({ selectedUsers, onUsersChange }: UserSelectorProps
       const response = await fetch(
         `/api/users/search?q=${encodeURIComponent(searchTerm)}&page=${pageNum}&limit=${maxSuggestedUsers}`
       );
-      if (!response.ok) throw new Error('Failed to fetch users');
+      if (!response.ok) throw new Error(t('errorFetchUsers'));
       const data = await response.json();
       return {
         users: data.users as User[],
         hasMore: data.hasMore as boolean
       };
     } catch (error) {
-      console.error('Error fetching users:', error);
+      console.error('Error fetching users:', error); // Keep console log for debugging
+      toast.error(t('errorFetchUsers'));
       return { users: [], hasMore: false };
     }
   };
@@ -117,8 +121,8 @@ export function UserSelector({ selectedUsers, onUsersChange }: UserSelectorProps
   return (
     <div className="space-y-2">
       <Label htmlFor="users" className="flex items-center gap-2">
-        Allow Access
-        <span className="text-sm text-muted-foreground">(Only applies when template is not public)</span>
+        {t('label')}
+        <span className="text-sm text-muted-foreground">{t('labelHint')}</span>
       </Label>
       <div className="space-y-2">
         {
@@ -131,7 +135,7 @@ export function UserSelector({ selectedUsers, onUsersChange }: UserSelectorProps
                 type="button"
                 onClick={() => handleUserRemove(userId)}
                 className="text-muted-foreground hover:text-foreground focus:outline-none rounded-full"
-                aria-label={`Remove user ${getUserDisplay(users.find(u => u.id === userId) || { id: userId, email: '' })}`}
+                aria-label={t('removeUserAriaLabel', { userName: getUserDisplay(users.find(u => u.id === userId) || { id: userId, email: '' }) })}
               >
                 <X className="h-3 w-3" />
               </button>
@@ -146,7 +150,7 @@ export function UserSelector({ selectedUsers, onUsersChange }: UserSelectorProps
             id="users"
             value={inputValue}
             onChange={(e) => setInputValue(e.target.value)}
-            placeholder="Search users by name or email..."
+            placeholder={t('searchPlaceholder')}
             // disabled={isLoading}
             aria-autocomplete="list"
             aria-controls="user-suggestions"
@@ -167,9 +171,9 @@ export function UserSelector({ selectedUsers, onUsersChange }: UserSelectorProps
                 </button>
               ))}
               {isLoading && filteredUsers.length===0 && (
-                    <div className='flex justify-start items-center gap-1.5 py-2'>
+                    <div className='flex justify-start items-center gap-1.5 py-2 px-4'> {/* Added padding */} 
                       <Loader2 className="h-4 w-4 animate-spin" />
-                      Loading...
+                      {t('loadingText')}
                     </div>
                   
                 )}
@@ -181,18 +185,18 @@ export function UserSelector({ selectedUsers, onUsersChange }: UserSelectorProps
                   disabled={isLoading}
                 >
                   {isLoading ? (
-                    <div className='flex justify-start items-center gap-1.5 py-2'>
+                    <div className='flex justify-center items-center gap-1.5 py-2'> {/* Centered loading */} 
                       <Loader2 className="h-4 w-4 animate-spin" />
-                      Loading...
+                      {t('loadingText')}
                     </div>
                   ) : (
-                    'Load more users'
+                    t('loadMoreButton')
                   )}
                 </button>
               )}
               {!isLoading && filteredUsers.length === 0 && (
                 <div className="px-4 py-2 text-sm text-muted-foreground">
-                  No matching users found.
+                  {t('noResultsText')}
                 </div>
               )}
             </div>

@@ -6,6 +6,7 @@ import { Plus } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { Skeleton } from '../ui/skeleton';
 import { Badge } from '../ui/badge';
+import { useTranslations } from 'next-intl';
 
 const PLACEHOLDER_COLORS = [
   'bg-blue-100 dark:bg-blue-900',
@@ -25,12 +26,13 @@ interface Template {
 
 
 const TemplateCard = ({ id, title, description, imageUrl,createdAt }: Template) => {
+  const t = useTranslations('TemplateGallery');
   const randomColor = PLACEHOLDER_COLORS[Math.floor(Math.random() * PLACEHOLDER_COLORS.length)];
 
   return (
     <Link href={`/templates/${id}`}>
       <Card className="aspect-[4/3] overflow-hidden hover:border-primary/50 transition-colors py-0 relative">
-        <div className="absolute top-2 right-2 z-10">
+        <div className="absolute top-2 right-2 z-10 ">
           <Badge variant="secondary" className="font-medium">
             {new Date(createdAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric',year: 'numeric' })}
           </Badge>
@@ -50,7 +52,7 @@ const TemplateCard = ({ id, title, description, imageUrl,createdAt }: Template) 
             <p className="text-sm text-muted-foreground mt-1 line-clamp-1">{description}</p>
           )}
           {!description && (
-            <p className="text-sm text-muted-foreground mt-1 line-clamp-1">go to the form page for more info</p>
+            <p className="text-sm text-muted-foreground mt-1 line-clamp-1">{t('goToFormPage')}</p>
           )}
         </div>
       </Card>
@@ -59,6 +61,7 @@ const TemplateCard = ({ id, title, description, imageUrl,createdAt }: Template) 
 };
 
 export default function TemplateGallery() {
+  const t = useTranslations('TemplateGallery');
   const [templates, setTemplates] = useState<Template[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -67,41 +70,36 @@ export default function TemplateGallery() {
     const fetchTemplates = async () => {
       try {
         const response = await fetch('/api/templates?limit=4&sort=latest');
-        if (!response.ok) throw new Error('Failed to fetch templates');
+        if (!response.ok) throw new Error(t('errorFetchTemplates'));
         const data = await response.json();
         setTemplates(data);
       } catch (err) {
-        setError(err instanceof Error ? err.message : 'Failed to fetch templates');
+        setError(err instanceof Error ? err.message : t('errorFetchTemplates'));
       } finally {
         setIsLoading(false);
       }
     };
 
     fetchTemplates();
-  }, []);
+  }, [t]);
 
   if (error) {
     return <div className="text-red-500">{error}</div>;
   }
 
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4 px-2">
+    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4 px-2 w-full">
 
       {isLoading ? (
-        <>
-         {
           [...Array(5)].map((_, i) => (
-             <div key={i} className="flex flex-col w-[200px] space-y-3 bg-white rounded-md dark:bg-background p-1">
+           <div key={i} className="flex flex-col w-[200px] space-y-3 bg-white rounded-md dark:bg-card p-1">
               <Skeleton className="h-[125px] w-[190px] rounded-xl" />
               <div className="space-y-2">
                 <Skeleton className="h-4 w-[190px]" />
                 <Skeleton className="h-4 w-[190px]" />
               </div>
             </div>
-      
           ))
-         }
-        </>
       ) : ( 
         <>       
         <Link href="/templates/create">
@@ -110,7 +108,7 @@ export default function TemplateGallery() {
               <Plus className="w-12 h-12 text-muted-foreground group-hover:text-primary transition-colors" />
             </div>
             <div>
-              <h3 className="font-medium text-center text-sm">Start a blank form</h3>
+              <h3 className="font-medium text-center text-sm">{t('startBlank')}</h3>
               {/* <p className="text-sm text-muted-foreground mt-1 truncate">Start with a blank template</p> */}
             </div>
           </Card>

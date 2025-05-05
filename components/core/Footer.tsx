@@ -1,21 +1,23 @@
 // import Link from 'next/link';
 import { Github, Twitter, Linkedin } from 'lucide-react';
+import { useTranslations } from 'next-intl';
 
 export default function Footer() {
+  const t = useTranslations('Footer');
   return (
     <footer className="border-t bg-background w-full">
       <div className="container py-2 md:py-4 max-w-5xl mx-auto">
         {/* i may add this section later if necessary */}
         {/* <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
           <div className="space-y-3">
-            <h3 className="text-lg font-semibold">FormCraft</h3>
+            <h3 className="text-lg font-semibold">{t('formCraft')}</h3>
             <p className="text-sm text-muted-foreground">
               Create, share, and manage forms with ease. Build beautiful forms in minutes.
             </p>
           </div>
           
           <div className="space-y-3">
-            <h4 className="font-medium">Product</h4>
+            <h4 className="font-medium">{t('product')}</h4>
             <ul className="space-y-2 text-sm">
               <li>
                 <Link href="/templates" className="text-muted-foreground hover:text-foreground transition-colors">
@@ -36,7 +38,7 @@ export default function Footer() {
           </div>
 
           <div className="space-y-3">
-            <h4 className="font-medium">Company</h4>
+            <h4 className="font-medium">{t('company')}</h4>
             <ul className="space-y-2 text-sm">
               <li>
                 <Link href="/about" className="text-muted-foreground hover:text-foreground transition-colors">
@@ -57,7 +59,7 @@ export default function Footer() {
           </div>
 
           <div className="space-y-3">
-            <h4 className="font-medium">Legal</h4>
+            <h4 className="font-medium">{t('legal')}</h4>
             <ul className="space-y-2 text-sm">
               <li>
                 <Link href="/privacy" className="text-muted-foreground hover:text-foreground transition-colors">
@@ -75,7 +77,7 @@ export default function Footer() {
 
         <div className="mt-2 pt-3 flex flex-col md:flex-row justify-between items-center gap-4">
           <p className="text-sm text-muted-foreground">
-            © {new Date().getFullYear()} FormCraft. All rights reserved.
+            © {new Date().getFullYear()} {t('formCraft')}. {t('allRightsReserved')}
           </p>
           <div className="flex space-x-4">
             <a

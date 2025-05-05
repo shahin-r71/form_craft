@@ -18,9 +18,11 @@ import ErrorMsg from '@/components/chore/ErrorMsg';
 import { TemplateEditFormProps } from '@/types/template';
 import { updateTemplateSchema, type UpdateTemplateInput } from '@/lib/validations/template';
 import { toast } from 'react-toastify'
+import { useTranslations } from 'next-intl'; // Import useTranslations
 
 
 export function TemplateEditForm({ template }: TemplateEditFormProps) {
+  const t = useTranslations('TemplateEditForm'); // Initialize translations
   const router = useRouter();
 
   const form = useForm<UpdateTemplateInput>({
@@ -67,15 +69,15 @@ export function TemplateEditForm({ template }: TemplateEditFormProps) {
         body: JSON.stringify(data)
       });
 
-      if (!response.ok) throw new Error('Failed to update template');
+      if (!response.ok) throw new Error(t('errorFailedToUpdate')); // Use translation
 
       const updatedTemplate = await response.json();
       router.push(`/templates/${updatedTemplate.id}`);
       router.refresh();
-      toast.success('Template updated successfully');
+      toast.success(t('templateUpdatedSuccess')); // Use translation
     } catch (error) {
       console.error('Error updating template:', error);
-      toast.error('Failed to update template');
+      toast.error(t('errorFailedToUpdate')); // Use translation
     }
   };
 
@@ -83,7 +85,7 @@ export function TemplateEditForm({ template }: TemplateEditFormProps) {
     <Card className="p-6">
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
         <div className="space-y-2">
-          <Label>Cover Image(Optional)</Label>
+          <Label>{t('coverImageLabel')}</Label> {/* Use translation */}
           <CoverImage
             value={form.watch("imageUrl")}
             onChange={(url: string | null) =>
@@ -99,7 +101,7 @@ export function TemplateEditForm({ template }: TemplateEditFormProps) {
         </div>
 
         <div className="space-y-2">
-          <Label htmlFor="title">Title</Label>
+          <Label htmlFor="title">{t('titleLabel')}</Label> {/* Use translation */}
           <Input id="title" {...form.register("title")} />
           {form.formState.errors.title && (
             <ErrorMsg message={form.formState.errors.title.message} />
@@ -107,7 +109,7 @@ export function TemplateEditForm({ template }: TemplateEditFormProps) {
         </div>
 
         <div className="space-y-2">
-          <Label htmlFor="description">Description</Label>
+          <Label htmlFor="description">{t('descriptionLabel')}</Label> {/* Use translation */}
           <Input id="description" {...form.register("description")} />
           {form.formState.errors.description && (
             <ErrorMsg message={form.formState.errors.description.message} />
@@ -139,7 +141,7 @@ export function TemplateEditForm({ template }: TemplateEditFormProps) {
               {...form.register("isPublic")}
               className="h-4 w-4"
             />
-            <span>Make this template public</span>
+            <span>{t('makePublicLabel')}</span> {/* Use translation */}
           </Label>
         </div>
 
@@ -155,7 +157,7 @@ export function TemplateEditForm({ template }: TemplateEditFormProps) {
 
         <div className="space-y-4">
           <div className="flex justify-between items-center">
-            <h3 className="text-lg font-medium">Form Fields</h3>
+            <h3 className="text-lg font-medium">{t('formFieldsTitle')}</h3> {/* Use translation */}
             
           </div>
 
@@ -164,25 +166,25 @@ export function TemplateEditForm({ template }: TemplateEditFormProps) {
             return (
               <Card key={field.id} className="p-4 space-y-4">
                 <div className="flex justify-between">
-                  <h4 className="font-medium">Field {index + 1}</h4>
+                  <h4 className="font-medium">{t('fieldLabel', { index: index + 1 })}</h4> {/* Use translation */}
                   <Button
                     type="button"
                     variant="destructive"
                     onClick={() => remove(index)}
                   >
-                    Remove
+                    {t('removeButton')} {/* Use translation */}
                   </Button>
                 </div>
 
                 <div className="space-y-2">
-                  <Label>Type</Label>
+                  <Label>{t('typeLabel')}</Label> {/* Use translation */}
                   <select
                     {...form.register(`templateFields.${index}.type` as const)}
                     className="w-full p-2 border rounded dark:bg-accent dark:text-white"
                   >
                     {Object.values(FieldType).map((type) => (
                       <option key={type} value={type}>
-                        {type}
+                        {type} {/* Assuming FieldType enum values are user-friendly */}
                       </option>
                     ))}
                   </select>
@@ -194,7 +196,7 @@ export function TemplateEditForm({ template }: TemplateEditFormProps) {
                 </div>
 
                 <div className="space-y-2">
-                  <Label>Title</Label>
+                  <Label>{t('titleLabel')}</Label> {/* Use translation */}
                   <Input {...form.register(`templateFields.${index}.title`)} />
                   {form.formState.errors.templateFields?.[index]?.title && (
                     <ErrorMsg
@@ -206,7 +208,7 @@ export function TemplateEditForm({ template }: TemplateEditFormProps) {
                 </div>
 
                 <div className="space-y-2">
-                  <Label>Description</Label>
+                  <Label>{t('descriptionLabel')}</Label> {/* Use translation */}
                   <Input {...form.register(`templateFields.${index}.description`)} />
                   {form.formState.errors.templateFields?.[index]?.description && (
                     <ErrorMsg
@@ -224,7 +226,7 @@ export function TemplateEditForm({ template }: TemplateEditFormProps) {
                       {...form.register(`templateFields.${index}.required`)}
                       className="h-4 w-4"
                     />
-                    <span>Required</span>
+                    <span>{t('requiredLabel')}</span> {/* Use translation */}
                   </Label>
                 </div>
 
@@ -235,23 +237,23 @@ export function TemplateEditForm({ template }: TemplateEditFormProps) {
                       {...form.register(`templateFields.${index}.showInResults`)}
                       className="h-4 w-4"
                     />
-                    <span>Show in Results</span>
+                    <span>{t('showInResultsLabel')}</span> {/* Use translation */}
                   </Label>
                 </div>
               </Card>
             );
           })}
 
-          {form.formState.errors.templateFields?.length === 0 && (
-            <ErrorMsg message="At least one field is required" />
+          {form.formState.errors.templateFields?.root && (
+            <ErrorMsg message={t('atLeastOneFieldRequired')} /> /* Use translation */
           )}
         </div>
         <div className='flex flex-col justify-between items-center gap-4 md:flex-row'>
             <Button type="button" className='w-1/2' onClick={addField}>
-                Add Field
+                {t('addFieldButton')} {/* Use translation */}
             </Button>
-            <Button type="submit" className="w-1/2">
-            Update Template
+            <Button type="submit" className="w-1/2" disabled={form.formState.isSubmitting}>
+            {form.formState.isSubmitting ? t('updatingTemplateButton') : t('updateTemplateButton')} {/* Use translation */}
             </Button>
         </div>
       </form>
