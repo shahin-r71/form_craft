@@ -22,7 +22,7 @@ export default function Page() {
             <CardContent>
               <p className="text-sm text-muted-foreground">
                 {/* Assuming a more detailed message might be needed, but using description for now */}
-                {t('signUpSuccessDescription')}
+                {/* {t('signUpSuccessDescription')} */}
               </p>
             </CardContent>
           </Card>
