@@ -11,7 +11,18 @@ export const userProfileSchema = z.object({
   avatarUrl: z.string().url('Invalid avatar URL').optional(),
 });
 
+export const userProfileUpdateSchema = z.object({
+  name: z.string()
+    .min(2, 'Name must be at least 2 characters')
+    .max(50, 'Name cannot exceed 50 characters')
+    .nullable()
+    .optional(), 
+  avatarUrl: z.string().nullable().optional(), 
+});
+// Removed the refinement that required at least one field
+
 export type UserProfileInput = z.infer<typeof userProfileSchema>;
+export type UserProfileUpdateInput = z.infer<typeof userProfileUpdateSchema>;
 
 export const updatePasswordSchema = z.object({
   currentPassword: z.string({

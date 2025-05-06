@@ -82,7 +82,7 @@ export default function ViewSubmissionPage() {
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-screen">
-        <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-blue-500"></div>
+        <div className="animate-spin rounded-full h-10 w-10 border-t-3 border-b-3 border-primary"></div>
       </div>
     );
   }
@@ -109,7 +109,7 @@ export default function ViewSubmissionPage() {
   //const formattedDate = new Date(submission.createdAt).toLocaleString();
 
   return (
-    <div className="container mx-auto py-8">
+    <div className="container mx-auto py-8 h-[100vh]">
       <div className="max-w-3xl mx-auto">
         <div className="flex justify-between items-center mb-6">
           <div>
@@ -134,26 +134,26 @@ export default function ViewSubmissionPage() {
               return (
                 <div key={field.id} className="border-b pb-4 last:border-b-0 last:pb-0">
                   <div className="flex justify-between items-start mb-2">
-                    <h3 className="font-medium text-lg">{field.title}</h3>
+                    <h3 className="font-medium text-lg">Question: {field.title}</h3>
                     <div className="text-sm text-gray-500 dark:text-gray-400">
                       Question Type: {field.type.toLowerCase()}
                     </div>
                   </div>
                   
                   {field.type === FieldType.STRING && (
-                    <p>{fieldSubmission?.valueString || 'No value provided'}</p>
+                    <p><span className='font-semibold'>Response: </span>{fieldSubmission?.valueString || 'No value provided'}</p>
                   )}
                   
                   {field.type === FieldType.TEXT && (
-                    <p className="whitespace-pre-wrap">{fieldSubmission?.valueString || 'No value provided'}</p>
+                    <p className="whitespace-pre-wrap"><span className='font-semibold'>Response: </span>{fieldSubmission?.valueString || 'No value provided'}</p>
                   )}
                   
                   {field.type === FieldType.INTEGER && (
-                    <p>{fieldSubmission?.valueInteger !== null ? fieldSubmission?.valueInteger : 'No value provided'}</p>
+                    <p><span className='font-semibold'>Response: </span>{fieldSubmission?.valueInteger !== null ? fieldSubmission?.valueInteger : 'No value provided'}</p>
                   )}
                   
                   {field.type === FieldType.CHECKBOX && (
-                    <p>{fieldSubmission?.valueBoolean ? 'Yes' : 'No'}</p>
+                    <p><span className='font-semibold'>Response: </span>{fieldSubmission?.valueBoolean ? 'Yes' : 'No'}</p>
                   )}
                 </div>
               );

@@ -92,8 +92,8 @@ export default function TemplateSubmissionsPage() {
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-screen">
-        <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-blue-500"></div>
-        <span className="ml-2">{t('loadingText')}</span>
+        <div className="animate-spin rounded-full h-10 w-10 border-t-3 border-b-3 border-primary"></div>
+        {/* <span className="ml-2">{t('loadingText')}</span> */}
       </div>
     );
   }
@@ -122,7 +122,7 @@ export default function TemplateSubmissionsPage() {
       <div className="max-w-6xl mx-auto">
         <div className="flex justify-between items-center mb-6">
           <h1 className="text-2xl font-bold">{t('submissionsFor', { title: template.title })}</h1>
-          <div className="space-x-2">
+          <div className="space-x-2 space-y-2">
             <Button onClick={() => router.push(`/templates/${id}`)}>
               {t('backToTemplate')}
             </Button>

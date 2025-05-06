@@ -9,6 +9,7 @@ import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Template } from '@/types/template';
 import { useTranslations, useFormatter } from 'next-intl';
+import { EditProfile } from '@/components/dashboard/edit-profile';
 
 
 interface User {
@@ -99,7 +100,7 @@ export default function DashboardPage() {
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-screen">
-        <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-blue-500"></div>
+        <div className="animate-spin rounded-full h-10 w-10 border-t-3 border-b-3 border-primary"></div>
       </div>
     );
   }
@@ -145,6 +146,17 @@ export default function DashboardPage() {
                 {/* Assuming user name translation is not needed, or handled elsewhere */}
                 <h2 className="text-2xl font-bold">{user.name || t('userNameFallback')}</h2> {/* Use translation */}
                 <p className="text-muted-foreground">{user.email}</p>
+                <EditProfile 
+                  userId={user.id}
+                  userName={user.name || ''}
+                  userEmail={user.email}
+                  userAvatarUrl={user.avatarUrl || ''}
+                  onProfileUpdate={() => {
+                    // Refresh user data after profile update
+                    router.refresh();
+                    window.location.reload();
+                  }}
+                />
               </div>
             </div>
           </CardContent>
@@ -158,7 +170,7 @@ export default function DashboardPage() {
           </TabsList>
 
           {/* Created Templates Tab */}
-          <TabsContent value="created" className="space-y-4 pt-4">
+          <TabsContent value="created" className="space-y-4 pt-4 min-h-[55vh]">
             <div className="flex justify-between items-center">
               <h3 className="text-xl font-semibold">{t('yourTemplatesTitle')}</h3>
               <Button onClick={() => router.push('/templates/create')}>
@@ -228,7 +240,7 @@ export default function DashboardPage() {
           </TabsContent>
 
           {/* Filled Templates Tab */}
-          <TabsContent value="filled" className="space-y-4 pt-4">
+          <TabsContent value="filled" className="space-y-4 pt-4 min-h-[55vh]">
             <h3 className="text-xl font-semibold">{t('templatesFilledTitle')}</h3>
             {filledTemplates.length === 0 ? (
               <Card className="p-6 text-center">
@@ -258,8 +270,7 @@ export default function DashboardPage() {
                         >
                           {t('viewTemplateButton')}
                         </Button>
-                        {/* Optionally add a button to view the specific submission details */}
-                        {/* <Button size="sm" onClick={() => router.push(`/submissions/${submission.id}`)}>View Submission</Button> */}
+                         <Button size="sm" onClick={() => router.push(`/templates/${submission.templateId}/submit/view?submissionId=${submission.id}`)}>View Submission</Button>
                       </div>
                     </CardContent>
                   </Card>

@@ -218,7 +218,7 @@ export default function TemplateResults() {
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-screen">
-        <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-blue-500"></div>
+        <div className="animate-spin rounded-full h-10 w-10 border-t-3 border-b-3 border-primary"></div>
       </div>
     );
   }
@@ -240,8 +240,8 @@ export default function TemplateResults() {
   }
 
   return (
-    <div className="container mx-auto px-4 py-8">
-      <div className="bg-white dark:bg-gray-800 max-w-3xl mx-auto rounded-lg shadow-lg p-6">
+    <div className="container mx-auto px-4 py-8 ">
+      <div className="bg-white dark:bg-secondary max-w-3xl mx-auto rounded-lg shadow-lg p-6">
         <div className="flex justify-end mb-4">
           <TemplateActions
             templateId={template.id}
@@ -405,7 +405,7 @@ export default function TemplateResults() {
 
               {isLoadingComments && (
                 <div className="flex justify-center">
-                  <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-blue-500"></div>
+                  <div className="animate-spin rounded-full h-10 w-10 border-t-3 border-b-3 border-primary"></div>
                 </div>
               )}
 
