@@ -94,6 +94,7 @@
     "errorGenericLike": "আবার চেষ্টা করার আগে কিছু শ্বাস নিন..."
   },
   "Dashboard": {
+    "ManageUserButton": "ব্যবহারকারী পরিচালনা করুন",
     "templatesCreatedTab": "তৈরি করা টেমপ্লেট",
     "templatesFilledTab": "পূরণ করা টেমপ্লেট",
     "yourTemplatesTitle": "আপনার টেমপ্লেট",

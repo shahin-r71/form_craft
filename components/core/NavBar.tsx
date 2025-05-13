@@ -13,12 +13,39 @@ import { Menu, Search, X } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { createClient } from '@/utils/supabase/client'; 
 import type { User } from '@supabase/supabase-js'; 
+import { usePathname } from 'next/navigation';
+
+// Define interface for search results
+interface SearchResult {
+  id: string;
+  title: string;
+  description: string | null;
+  imageUrl: string | null;
+  owner: {
+    id: string;
+    name: string | null;
+    avatarUrl: string | null;
+  };
+  topic: {
+    id: string;
+    name: string;
+  } | null;
+  stats: {
+    likes: number;
+    submissions: number;
+  };
+  createdAt: string;
+}
 
 export default function NavBar() {
   const t = useTranslations('Navbar');
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
+  const [searchResults, setSearchResults] = useState<SearchResult[]>([]);
+  const [isSearching, setIsSearching] = useState(false);
+  const [showResults, setShowResults] = useState(false);
   const router = useRouter();
+  const pathname = usePathname();
   const [currentLocale, setCurrentLocale] = useState('en');
   const [user, setUser] = useState<User | null>(null); // State for user session
   const supabase = createClient(); // Create Supabase client instance
@@ -52,11 +79,62 @@ export default function NavBar() {
       authListener?.subscription.unsubscribe();
     };
   }, [supabase]); 
+
+  // Debounce search to avoid too many API calls
+  useEffect(() => {
+    if (!searchQuery.trim()) {
+      setSearchResults([]);
+      setShowResults(false);
+      return;
+    }
+
+    const debounceTimer = setTimeout(async () => {
+      if (searchQuery.trim().length >= 2) {
+        setIsSearching(true);
+        try {
+          const response = await fetch(`/api/search?q=${encodeURIComponent(searchQuery)}`);
+          if (response.ok) {
+            const data = await response.json();
+            setSearchResults(data.results || []);
+            setShowResults(true);
+          }
+        } catch (error) {
+          console.error('Search error:', error);
+        } finally {
+          setIsSearching(false);
+        }
+      }
+    }, 300); // 300ms debounce
+
+    return () => clearTimeout(debounceTimer);
+  }, [searchQuery]);
+
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
-    // Implement search functionality
-    console.log('Search:', searchQuery);
+    if (searchQuery.trim()) {
+      // Navigate to search results page or handle as needed
+      setShowResults(false);
+      // router.push(`/search?q=${encodeURIComponent(searchQuery)}`);
+    }
   };
+
+  const handleResultClick = (templateId: string) => {
+    setSearchQuery('');
+    setShowResults(false);
+    router.push(`/templates/${templateId}`);
+  };
+
+  // Close search results when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      if (!(e.target as Element).closest('.search-container')) {
+        setShowResults(false);
+      }
+    };
+
+    document.addEventListener('click', handleClickOutside);
+    return () => document.removeEventListener('click', handleClickOutside);
+  }, []);
 
   return (
     <nav className="px-2 sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
@@ -72,7 +150,7 @@ export default function NavBar() {
 
         {/* Search Box - Centered */}
         <div className="hidden md:flex flex-1 justify-center">
-          <form onSubmit={handleSearch} className="w-full max-w-xl mx-4">
+          <form onSubmit={handleSearch} className="w-full max-w-xl mx-4 search-container" onClick={(e) => e.stopPropagation()}>
             <div className="relative">
               <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
               <Input
@@ -81,7 +159,63 @@ export default function NavBar() {
                 className="w-full pl-8"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
+                onClick={(e) => e.stopPropagation()}
               />
+              {isSearching && (
+                <div className="absolute right-2.5 top-2.5 z-10">
+                  <div className="h-4 w-4 animate-spin rounded-full border-2 border-primary border-t-transparent"></div>
+                </div>
+              )}
+              
+              {/* Search Results Dropdown */}
+              {showResults && searchResults.length > 0 && (
+                <div className="absolute top-full left-0 right-0 mt-1 max-h-[70vh] overflow-y-auto rounded-md border bg-background shadow-md z-50">
+                  <div className="p-2">
+                    <h3 className="text-sm font-medium text-muted-foreground mb-2">Search Results</h3>
+                    <ul className="space-y-1">
+                      {searchResults.map((result) => (
+                        <li key={result.id}>
+                          <button
+                            className="w-full text-left px-3 py-2 rounded-md hover:bg-accent flex items-start gap-3"
+                            onClick={() => handleResultClick(result.id)}
+                          >
+                            {result.imageUrl ? (
+                              <img 
+                                src={result.imageUrl} 
+                                alt="" 
+                                className="h-10 w-10 rounded object-cover flex-shrink-0" 
+                              />
+                            ) : (
+                              <div className="h-10 w-10 rounded bg-muted flex-shrink-0 flex items-center justify-center">
+                                <Search className="h-4 w-4 text-muted-foreground" />
+                              </div>
+                            )}
+                            <div className="overflow-hidden">
+                              <h4 className="font-medium truncate">{result.title}</h4>
+                              {result.description && (
+                                <p className="text-sm text-muted-foreground truncate">
+                                  {result.description}
+                                </p>
+                              )}
+                              <div className="text-xs text-muted-foreground mt-1 flex items-center gap-2">
+                                <span>{result.owner.name || 'Unknown user'}</span>
+                                <span>•</span>
+                                <span>{result.stats.submissions} submissions</span>
+                              </div>
+                            </div>
+                          </button>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                </div>
+              )}
+              
+              {showResults && searchQuery.trim() && searchResults.length === 0 && (
+                <div className="absolute top-full left-0 right-0 mt-1 rounded-md border bg-background p-4 shadow-md z-50">
+                  <p className="text-center text-muted-foreground">No results found</p>
+                </div>
+              )}
             </div>
           </form>
         </div>
@@ -112,9 +246,11 @@ export default function NavBar() {
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className='flex flex-col gap-1 items-center justify-center'>
-                <DropdownMenuItem onClick={() => router.push('/dashboard')}>
-                  {t('dashboardLink')}
-                </DropdownMenuItem>
+                {pathname !== '/dashboard' && (
+                  <DropdownMenuItem onClick={() => router.push('/dashboard')}>
+                    {t('dashboardLink')}
+                  </DropdownMenuItem>
+                )}
                 <DropdownMenuItem>
                   <LogoutButton />
                 </DropdownMenuItem>
@@ -140,7 +276,7 @@ export default function NavBar() {
         {/* Mobile Menu */}
         {isMenuOpen && (
           <div className="absolute top-full left-0 right-0 bg-background border-b p-4 md:hidden">
-            <form onSubmit={handleSearch} className="mb-4">
+            <form onSubmit={handleSearch} className="mb-4 search-container" onClick={(e) => e.stopPropagation()}>
               <div className="relative">
                 <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
                 <Input
@@ -149,7 +285,63 @@ export default function NavBar() {
                   className="w-full pl-8"
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
+                  onClick={(e) => e.stopPropagation()}
                 />
+                {isSearching && (
+                  <div className="absolute right-2.5 top-2.5 z-10">
+                    <div className="h-4 w-4 animate-spin rounded-full border-2 border-primary border-t-transparent"></div>
+                  </div>
+                )}
+                
+                {/* Mobile Search Results */}
+                {showResults && searchResults.length > 0 && (
+                  <div className="absolute top-full left-0 right-0 mt-1 max-h-[50vh] overflow-y-auto rounded-md border bg-background shadow-md z-50">
+                    <div className="p-2">
+                      <h3 className="text-sm font-medium text-muted-foreground mb-2">Search Results</h3>
+                      <ul className="space-y-1">
+                        {searchResults.map((result) => (
+                          <li key={result.id}>
+                            <button
+                              className="w-full text-left px-3 py-2 rounded-md hover:bg-accent flex items-start gap-3"
+                              onClick={() => handleResultClick(result.id)}
+                            >
+                              {result.imageUrl ? (
+                                <img 
+                                  src={result.imageUrl} 
+                                  alt="" 
+                                  className="h-10 w-10 rounded object-cover flex-shrink-0" 
+                                />
+                              ) : (
+                                <div className="h-10 w-10 rounded bg-muted flex-shrink-0 flex items-center justify-center">
+                                  <Search className="h-4 w-4 text-muted-foreground" />
+                                </div>
+                              )}
+                              <div className="overflow-hidden">
+                                <h4 className="font-medium truncate">{result.title}</h4>
+                                {result.description && (
+                                  <p className="text-sm text-muted-foreground truncate">
+                                    {result.description}
+                                  </p>
+                                )}
+                                <div className="text-xs text-muted-foreground mt-1 flex items-center gap-2">
+                                  <span>{result.owner.name || 'Unknown user'}</span>
+                                  <span>•</span>
+                                  <span>{result.stats.submissions} submissions</span>
+                                </div>
+                              </div>
+                            </button>
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  </div>
+                )}
+                
+                {showResults && searchQuery.trim() && searchResults.length === 0 && (
+                  <div className="absolute top-full left-0 right-0 mt-1 rounded-md border bg-background p-4 shadow-md z-50">
+                    <p className="text-center text-muted-foreground">No results found</p>
+                  </div>
+                )}
               </div>
             </form>
             <div className="flex flex-col space-y-4">
@@ -169,13 +361,15 @@ export default function NavBar() {
               </select>
               {user ? (
                 <>
-                  <Button
-                    variant="ghost"
-                    className="flex items-center justify-start"
-                    onClick={() => router.push('/dashboard')}
-                  >
-                    {t('dashboardLink')}
-                  </Button>
+                  {pathname !== '/dashboard' && (
+                    <Button
+                      variant="ghost"
+                      className="flex items-center justify-start"
+                      onClick={() => router.push('/dashboard')}
+                    >
+                      {t('dashboardLink')}
+                    </Button>
+                  )}
                   <LogoutButton />
                 </>
               ) : (

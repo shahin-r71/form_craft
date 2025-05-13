@@ -21,6 +21,7 @@ interface User {
   email: string;
   name?: string | null;
   avatarUrl?: string | null;
+  isAdmin?: boolean;
 }
 
 interface Submission {
@@ -69,7 +70,8 @@ export default function DashboardPage() {
           id: authUser.id,
           email: authUser.email || '',
           name: userData.name,
-          avatarUrl: userData.avatarUrl
+          avatarUrl: userData.avatarUrl,
+          isAdmin: userData.isAdmin || false,
         });
         
         // Initialize profile editing state
@@ -232,98 +234,110 @@ export default function DashboardPage() {
         {/* User Profile Card */}
         <Card>
           <CardContent className="pt-6">
-            <div className="flex flex-col md:flex-row items-center gap-6">
+            <div className="flex items-center justify-between">
               {/* Avatar with upload functionality */}
-              <CldUploadWidget
-                uploadPreset={cloudPresetName || ''}
-                onSuccess={(result, { widget }) => {
-                  const info = result.info;
-                  if (info && typeof info === "object" && "secure_url" in info) {
-                    const newAvatarUrl = info.secure_url as string;
-                    setAvatarUrl(newAvatarUrl);
-                    updateAvatar(newAvatarUrl);
-                  }
-                  widget.close();
-                }}
-                options={{
-                  multiple: false,
-                  folder: "form_craft",
-                  resourceType: "image",
-                  maxImageFileSize: 2000000, // 2MB
-                  clientAllowedFormats: ["png", "jpeg", "jpg"],
-                  showUploadMoreButton: false,
-                }}
-              >
-                {({ open }) => (
-                  <div className="cursor-pointer relative group" onClick={() => open()}>
-                    <Avatar className="h-24 w-24 transition-opacity">
-                      <AvatarImage src={user.avatarUrl || ''} alt={user.name || user.email} />
-                      <AvatarFallback className="text-2xl">
-                        {getInitials(user.name, user.email)}
-                      </AvatarFallback>
-                    </Avatar>
-                    <div className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-50 rounded-full opacity-0 group-hover:opacity-80 transition-opacity">
-                      <PencilIcon className="h-8 w-8 text-white" />
+              <div className="flex flex-col md:flex-row gap-6">
+                <CldUploadWidget
+                  uploadPreset={cloudPresetName || ''}
+                  onSuccess={(result, { widget }) => {
+                    const info = result.info;
+                    if (info && typeof info === "object" && "secure_url" in info) {
+                      const newAvatarUrl = info.secure_url as string;
+                      setAvatarUrl(newAvatarUrl);
+                      updateAvatar(newAvatarUrl);
+                    }
+                    widget.close();
+                  }}
+                  options={{
+                    multiple: false,
+                    folder: "form_craft",
+                    resourceType: "image",
+                    maxImageFileSize: 2000000, // 2MB
+                    clientAllowedFormats: ["png", "jpeg", "jpg"],
+                    showUploadMoreButton: false,
+                  }}
+                >
+                  {({ open }) => (
+                    <div className="cursor-pointer relative group" onClick={() => open()}>
+                      <Avatar className="h-24 w-24 transition-opacity">
+                        <AvatarImage src={user.avatarUrl || ''} alt={user.name || user.email} />
+                        <AvatarFallback className="text-2xl">
+                          {getInitials(user.name, user.email)}
+                        </AvatarFallback>
+                      </Avatar>
+                      <div className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-50 rounded-full opacity-0 group-hover:opacity-80 transition-opacity">
+                        <PencilIcon className="h-8 w-8 text-white" />
+                      </div>
                     </div>
-                  </div>
-                )}
-              </CldUploadWidget>
+                  )}
+                </CldUploadWidget>
+                <div className="space-y-1 text-center md:text-left">
+                  <h2 className="text-2xl font-bold">{user.name || t('userNameFallback')}</h2>
+                  <p className="text-muted-foreground">{user.email}</p>
+                  
+                  {/* Name edit dialog */}
+                  <Dialog open={isProfileDialogOpen} onOpenChange={setIsProfileDialogOpen}>
+                    <DialogTrigger asChild>
+                      <Button variant="outline" size="sm">
+                        <PencilIcon className="h-4 w-4 mr-2" />
+                        {t('editProfile')}
+                      </Button>
+                    </DialogTrigger>
+                    <DialogContent className="sm:max-w-[425px]">
+                      <DialogHeader>
+                        <DialogTitle>{t('editProfileTitle')}</DialogTitle>
+                      </DialogHeader>
+                      <form onSubmit={handleProfileSubmit} className="space-y-6">
+                        <div className="space-y-4">
+                          <div className="space-y-2">
+                            <Label htmlFor="name">{t('nameLabel')}</Label>
+                            <Input
+                              id="name"
+                              value={name}
+                              onChange={(e) => setName(e.target.value)}
+                              placeholder={t('namePlaceholder')}
+                            />
+                          </div>
+                          <div className="space-y-2">
+                            <Label htmlFor="email">{t('emailLabel')}</Label>
+                            <Input
+                              id="email"
+                              value={user.email}
+                              disabled
+                              className="bg-muted"
+                            />
+                            <p className="text-sm text-muted-foreground">{t('emailCannotBeChanged')}</p>
+                          </div>
+                        </div>
+                        {profileError && <p className="text-sm text-red-500">{profileError}</p>}
+                        <div className="flex justify-end space-x-2">
+                          <Button
+                            type="button"
+                            variant="outline"
+                            onClick={() => setIsProfileDialogOpen(false)}
+                            disabled={isProfileLoading}
+                          >
+                            {t('cancel')}
+                          </Button>
+                          <Button type="submit" disabled={isProfileLoading}>
+                            {isProfileLoading ? t('saving') : t('saveChanges')}
+                          </Button>
+                        </div>
+                      </form>
+                    </DialogContent>
+                  </Dialog>
+                </div>
+              </div>
               
-              <div className="space-y-1 text-center md:text-left">
-                <h2 className="text-2xl font-bold">{user.name || t('userNameFallback')}</h2>
-                <p className="text-muted-foreground">{user.email}</p>
-                
-                {/* Name edit dialog */}
-                <Dialog open={isProfileDialogOpen} onOpenChange={setIsProfileDialogOpen}>
-                  <DialogTrigger asChild>
-                    <Button variant="outline" size="sm">
-                      <PencilIcon className="h-4 w-4 mr-2" />
-                      {t('editProfile')}
+              <div className='self-end'>
+                {
+                  user.isAdmin?
+                    <Button variant='secondary' onClick={() => router.push('/admin/users')}>
+                      {t('ManageUserButton')}
                     </Button>
-                  </DialogTrigger>
-                  <DialogContent className="sm:max-w-[425px]">
-                    <DialogHeader>
-                      <DialogTitle>{t('editProfileTitle')}</DialogTitle>
-                    </DialogHeader>
-                    <form onSubmit={handleProfileSubmit} className="space-y-6">
-                      <div className="space-y-4">
-                        <div className="space-y-2">
-                          <Label htmlFor="name">{t('nameLabel')}</Label>
-                          <Input
-                            id="name"
-                            value={name}
-                            onChange={(e) => setName(e.target.value)}
-                            placeholder={t('namePlaceholder')}
-                          />
-                        </div>
-                        <div className="space-y-2">
-                          <Label htmlFor="email">{t('emailLabel')}</Label>
-                          <Input
-                            id="email"
-                            value={user.email}
-                            disabled
-                            className="bg-muted"
-                          />
-                          <p className="text-sm text-muted-foreground">{t('emailCannotBeChanged')}</p>
-                        </div>
-                      </div>
-                      {profileError && <p className="text-sm text-red-500">{profileError}</p>}
-                      <div className="flex justify-end space-x-2">
-                        <Button
-                          type="button"
-                          variant="outline"
-                          onClick={() => setIsProfileDialogOpen(false)}
-                          disabled={isProfileLoading}
-                        >
-                          {t('cancel')}
-                        </Button>
-                        <Button type="submit" disabled={isProfileLoading}>
-                          {isProfileLoading ? t('saving') : t('saveChanges')}
-                        </Button>
-                      </div>
-                    </form>
-                  </DialogContent>
-                </Dialog>
+                    :
+                    null
+                }
               </div>
             </div>
           </CardContent>

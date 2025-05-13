@@ -9,19 +9,20 @@ datasource db {
 }
 
 model User {
-  id             String           @id @db.Uuid
-  email          String           @unique
-  name           String?
-  avatarUrl      String?          @map("avatar_url")
-  isAdmin        Boolean          @default(false) @map("is_admin")
-  isActive       Boolean          @default(true) @map("is_active")
-  createdAt      DateTime         @default(now()) @map("created_at") @db.Timestamptz(6)
-  updatedAt      DateTime         @updatedAt @map("updated_at") @db.Timestamptz(6)
-  comments       Comment[]
-  likes          Like[]
-  submissions    Submission[]
-  templateAccess TemplateAccess[]
-  templates      Template[]       @relation("OwnedTemplates")
+  id                String             @id @db.Uuid
+  email             String             @unique
+  name              String?
+  avatarUrl         String?            @map("avatar_url")
+  isAdmin           Boolean            @default(false) @map("is_admin")
+  isActive          Boolean            @default(true) @map("is_active")
+  createdAt         DateTime           @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt         DateTime           @updatedAt @map("updated_at") @db.Timestamptz(6)
+  comments          Comment[]
+  likes             Like[]
+  submissions       Submission[]
+  templateAccess    TemplateAccess[]
+  templates         Template[]         @relation("OwnedTemplates")
+  user_admin_status user_admin_status?
 
   @@map("users")
 }
@@ -46,26 +47,28 @@ model Tag {
 }
 
 model Template {
-  id             String           @id @default(uuid()) @db.Uuid
+  id             String                   @id @default(uuid()) @db.Uuid
   title          String
   description    String?
-  imageUrl       String?          @map("image_url")
-  isPublic       Boolean          @default(true) @map("is_public")
-  ownerId        String           @map("owner_id") @db.Uuid
-  topicId        String?          @map("topic_id") @db.Uuid
-  createdAt      DateTime         @default(now()) @map("created_at") @db.Timestamptz(6)
-  updatedAt      DateTime         @updatedAt @map("updated_at") @db.Timestamptz(6)
+  imageUrl       String?                  @map("image_url")
+  isPublic       Boolean                  @default(true) @map("is_public")
+  ownerId        String                   @map("owner_id") @db.Uuid
+  topicId        String?                  @map("topic_id") @db.Uuid
+  createdAt      DateTime                 @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt      DateTime                 @updatedAt @map("updated_at") @db.Timestamptz(6)
+  fts            Unsupported("tsvector")? @default(dbgenerated("to_tsvector('english'::regconfig, ((title || ' '::text) || COALESCE(description, ''::text)))"))
   comments       Comment[]
   likes          Like[]
   submissions    Submission[]
   accessGrants   TemplateAccess[]
   templateFields TemplateField[]
   templateTags   TemplateTag[]
-  owner          User             @relation("OwnedTemplates", fields: [ownerId], references: [id], onDelete: Cascade)
-  topic          Topic?           @relation(fields: [topicId], references: [id])
+  owner          User                     @relation("OwnedTemplates", fields: [ownerId], references: [id], onDelete: Cascade)
+  topic          Topic?                   @relation(fields: [topicId], references: [id])
 
   @@index([ownerId])
   @@index([topicId])
+  @@index([fts], type: Gin)
   @@map("templates")
 }
 
@@ -173,6 +176,14 @@ model TemplateAccess {
   @@index([templateId])
   @@index([userId])
   @@map("template_access")
+}
+
+/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
+model user_admin_status {
+  user_id      String   @id @db.Uuid
+  is_admin     Boolean  @default(false)
+  last_updated DateTime @default(now()) @db.Timestamptz(6)
+  users        User     @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
 }
 
 enum FieldType {

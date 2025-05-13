@@ -94,6 +94,7 @@
     "errorGenericLike": "Take some breath before trying again..."
   },
   "Dashboard": {
+    "ManageUserButton": "Manage Users",
     "templatesCreatedTab": "Created Templates",
     "templatesFilledTab": "Filled Templates",
     "yourTemplatesTitle": "Your Templates",
